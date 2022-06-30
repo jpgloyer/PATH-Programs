@@ -3,6 +3,9 @@ import Password_Encryption
 import sys
 import string
 import random
+from colorama import init
+from termcolor import colored
+
 
 def decrypt_password_list(Master_Password):
     password_values,key = Password_Encryption.get_vals_from_password(Master_Password,int(len(Password_Encryption.get_chars())/2-1))
@@ -38,12 +41,11 @@ def randomize_password():
             print('Enter a valid number')
     for i in range(length):
         new_password = new_password + random.choice(char_options)
-    print(f'Your new password is: {new_password}')
-    
-
+    print('Your new password is: '+colored(str(new_password),'green'))
     return new_password
 
 def main():
+    init()
     decrypted_password_list = [[]]
     Master_Password = getpass("Master Password:")
     operation_choice = -1
@@ -54,7 +56,7 @@ def main():
     if Master_Password == 'New':
         decrypted_password_list[0] = ['Website', 'Username', 'Password']
 
-    options = [['Find Password',0],['Add Password',1],['Change Master Password',2],['Change Password',3],['Remove Entry',4]]
+    options = [['Find Password',0],['Add Password',1],['Change Master Password',2],['Change Password',3],['Remove Entry',4],['Generate Random Password',5]]
     
     while operation_choice != 'q':
         #print('-----------------------------------------')
@@ -80,7 +82,7 @@ def main():
             print('\n\n')
             print(f'{decrypted_password_list[0][0]}:'.ljust(14) + f'{decrypted_password_list[int(password_choice)][0]}'.ljust(30) + '\n'
                 f'{decrypted_password_list[0][1]}:'.ljust(15) + f'{decrypted_password_list[int(password_choice)][1]}'.ljust(30) + '\n'
-                f'{decrypted_password_list[0][2]}:'.ljust(15) + f'{decrypted_password_list[int(password_choice)][2]}'.ljust(30))
+                +f'{decrypted_password_list[0][2]}:'.ljust(14) + colored(f'{decrypted_password_list[int(password_choice)][2]}'.ljust(30),color='red',attrs=['bold']))
             print('\n\n')
 
         elif operation_choice == '1':
@@ -89,6 +91,9 @@ def main():
             confirmed_password = ' '
             website = (input('Website:')).upper()
             username = input('Username:')
+            if input('Would you like to randomize this password(YES):') == 'YES':
+                password = randomize_password()
+                confirmed_password = password
             while password != confirmed_password:
                 password = getpass('Password:')
                 confirmed_password = getpass('Confirm password:')
@@ -137,11 +142,15 @@ def main():
                 choice = input('Select entry number to be removed (-1 to cancel):')
             for i in range(len(decrypted_password_list)):
                 if str(i) != choice:
-                    print(i,choice)
+                    #print(i,choice)
                     decrypted_password_list_new.append(decrypted_password_list[i])
             decrypted_password_list = decrypted_password_list_new
         
             rewrite_to_file(decrypted_password_list,Master_Password)
+
+        elif operation_choice == '5':
+            print('Copy for later use')
+            randomize_password()
     
     
              
