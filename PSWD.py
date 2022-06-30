@@ -9,7 +9,7 @@ from termcolor import colored
 
 def decrypt_password_list(Master_Password):
     password_values,key = Password_Encryption.get_vals_from_password(Master_Password,int(len(Password_Encryption.get_chars())/2-1))
-    decrypted_password_list = ('').join(Password_Encryption.decrypt(Password_Encryption.message_list_generator('Encrypted_Passwords.txt'),password_values,key,Password_Encryption.get_chars())).split(('\n'))
+    decrypted_password_list = ('').join(Password_Encryption.decrypt(Password_Encryption.message_list_generator('c:/users/jpglo/mypythonscripts/Encrypted_Passwords.txt'),password_values,key,Password_Encryption.get_chars())).split(('\n'))
     for i in range(len(decrypted_password_list)):
         decrypted_password_list[i] = decrypted_password_list[i].split(': ')
     return decrypted_password_list
@@ -24,7 +24,7 @@ def rewrite_to_file(decrypted_list,Master_Password):
     for i in decrypted_list:
         lines.append((': ').join(i))
     lines = ('\n').join(lines)
-    with open('Encrypted_Passwords.txt','w') as Output:
+    with open('c:/users/jpglo/mypythonscripts/Encrypted_Passwords.txt','w') as Output:
         Output.write(encrypt_password_list(Master_Password,lines))
 
 def randomize_password():
