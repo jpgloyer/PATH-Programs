@@ -8,7 +8,7 @@ import random
 from colorama import init
 from termcolor import colored
 import smtplib
-from email.mime.multipart import MIMEMultipart
+#from email.mime.multipart import MIMEMultipart
 
 
 def decrypt_password_list(Master_Password):
@@ -46,6 +46,7 @@ def randomize_password():
     for i in range(length):
         new_password = new_password + random.choice(char_options)
     print('Your new password is: '+colored(str(new_password),'green'))
+
     if input('Would you like to email this password to yourself("YES"):') == 'YES':
         print(new_password)
         email_password(new_password)
@@ -54,24 +55,25 @@ def randomize_password():
 
 def email_password(password):
     sender_add = 'jpgloyer@gmail.com'
-    receiver_add=input("Exact Recipient Email:")
-    email_password='vapdoemguofindyt'
-    #print(password)
-    smtp_server=smtplib.SMTP('smtp.gmail.com',587)
+    if input('Email may be unsecure. Continue at your own risk("YES"):'):
+        receiver_add=input("Exact Recipient Email:")
+        email_password='vapdoemguofindyt'
+        #print(password)
+        smtp_server=smtplib.SMTP('smtp.gmail.com',587)
 
-    #Logon
-    smtp_server.ehlo()
-    #Encrypt
-    smtp_server.starttls()
-    #Logon again
-    smtp_server.ehlo()
+        #Logon
+        smtp_server.ehlo()
+        #Encrypt
+        smtp_server.starttls()
+        #Logon again
+        smtp_server.ehlo()
 
-    smtp_server.login(sender_add,email_password)
+        smtp_server.login(sender_add,email_password)
 
-    msg_to_be_sent=f'''\\From: {sender_add} \nSubject: New Password \n\n{password}'''
-    print('msg:'+msg_to_be_sent)
-    smtp_server.sendmail(sender_add,receiver_add,msg_to_be_sent)
-    smtp_server.quit()
+        msg_to_be_sent=f'''\\From: {sender_add} \nSubject: New Password \n\n{password}'''
+        print('msg:'+msg_to_be_sent)
+        smtp_server.sendmail(sender_add,receiver_add,msg_to_be_sent)
+        smtp_server.quit()
 
 def main():
     init()
