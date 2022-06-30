@@ -1,4 +1,6 @@
 from getpass import getpass
+
+from rsa import verify
 import Password_Encryption
 import sys
 import string
@@ -99,7 +101,7 @@ def main():
                 confirmed_password = getpass('Confirm password:')
 
             decrypted_password_list.append([website,username,password])
-            rewrite_to_file(decrypted_password_list,Master_Password)
+            #rewrite_to_file(decrypted_password_list,Master_Password)
 
         elif operation_choice == '2':
             #Change master password---------------------------------------------------------------------------------------------------
@@ -110,14 +112,26 @@ def main():
                 new_confirmed_password = getpass('Confirm password:')
             Master_Password = new_password
 
-            rewrite_to_file(decrypted_password_list,Master_Password)
+            #rewrite_to_file(decrypted_password_list,Master_Password)
 
         elif operation_choice == '3':
             #Change entry---------------------------------------------------------------------------------------------------
             for i in range(len(decrypted_password_list)):
                 print(f'{i}:'.ljust(5) + f'{decrypted_password_list[i][0]}'.ljust(20,'-') + f'{decrypted_password_list[i][1]}'.ljust(40))
+            password_choice = 0
+            choice_checks = False
 
-            password_choice = input('Select password number to change:')    
+            #Runs until user entered value serves as a valid list index
+            while not choice_checks:
+                try:
+                    password_choice = input('Select password number to change:')
+                    decrypted_password_list[int(password_choice)]
+                    if password_choice != 0:
+                        choice_checks = True
+                    else:
+                        print('Enter a valid number')
+                except:
+                    print('Enter a valid number')
             print(decrypted_password_list[int(password_choice)][0])
             new_password = ''
             new_confirmed_password = ' '
@@ -129,7 +143,7 @@ def main():
                 new_confirmed_password = getpass('Confirm password:')
             decrypted_password_list[int(password_choice)][2] = new_password 
 
-            rewrite_to_file(decrypted_password_list,Master_Password)
+            #rewrite_to_file(decrypted_password_list,Master_Password)
 
 
         elif operation_choice == '4':
@@ -146,11 +160,13 @@ def main():
                     decrypted_password_list_new.append(decrypted_password_list[i])
             decrypted_password_list = decrypted_password_list_new
         
-            rewrite_to_file(decrypted_password_list,Master_Password)
+            #rewrite_to_file(decrypted_password_list,Master_Password)
 
         elif operation_choice == '5':
             print('Copy for later use')
             randomize_password()
+
+    rewrite_to_file(decrypted_password_list,Master_Password)
     
     
              
