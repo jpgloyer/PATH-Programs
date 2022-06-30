@@ -91,8 +91,10 @@ def main():
     
     while operation_choice != 'q':
         #print('-----------------------------------------')
+        print()
         for i in options:
-            print(f'{i[1]}:\t{i[0]}\n')
+            print(f'{i[1]}:\t{i[0]}')
+        print()
         if Master_Password != 'New':
             operation_choice = input('Enter operation number("q" to quit):')
         else: 
@@ -105,8 +107,10 @@ def main():
         if operation_choice == '0':
             #Reveal entry password---------------------------------------------------------------------------------------------------
             #Print options
+            print()
             for i in range(len(decrypted_password_list)):
                 print(f'{i}:'.ljust(5) + f'{decrypted_password_list[i][0]}'.ljust(20,'-') + f'{decrypted_password_list[i][1]}'.ljust(40))
+            print()
             password_choice = input('Select password number to reveal:')
             #print('-----------------------------------------')
             #Print entry info
