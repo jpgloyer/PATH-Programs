@@ -1,6 +1,6 @@
 from getpass import getpass
 
-from rsa import verify
+#from rsa import verify
 import Password_Encryption
 import sys
 import string
