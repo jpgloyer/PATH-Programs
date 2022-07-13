@@ -13,15 +13,15 @@ import smtplib
 
 def decrypt_password_list(Master_Password):
     password_values,key = Password_Encryption.get_vals_from_password(Master_Password,int(len(Password_Encryption.get_chars())/2-1))
-    decrypted_password_list = ('').join(Password_Encryption.decrypt(Password_Encryption.message_list_generator('c:/users/jpglo/mypythonscripts/Encrypted_Passwords.txt'),password_values,key,Password_Encryption.get_chars())).split(('\n'))
-    for i in range(len(decrypted_password_list)):
-        decrypted_password_list[i] = decrypted_password_list[i].split(': ')
-    return decrypted_password_list
+    decrypted_lines_list = ('').join(Password_Encryption.decrypt(Password_Encryption.message_list_generator('c:/users/jpglo/mypythonscripts/Encrypted_Passwords.txt'),password_values,key,Password_Encryption.get_chars())).split(('\n'))
+    for i in range(len(decrypted_lines_list)):
+        decrypted_lines_list[i] = decrypted_lines_list[i].split(': ')
+    return decrypted_lines_list
 
 def encrypt_password_list(Master_Password,message):
     password_values,key = Password_Encryption.get_vals_from_password(Master_Password,int(len(Password_Encryption.get_chars())/2-1))
-    encrypted_password_list = ('').join(Password_Encryption.encrypt(message,password_values,key,Password_Encryption.get_chars()))
-    return encrypted_password_list
+    encrypted_lines_list = ('').join(Password_Encryption.encrypt(message,password_values,key,Password_Encryption.get_chars()))
+    return encrypted_lines_list
     
 def rewrite_to_file(decrypted_list,Master_Password):
     lines = []
@@ -34,9 +34,10 @@ def rewrite_to_file(decrypted_list,Master_Password):
 def randomize_password():
     new_password = ''
     length = 0
-    char_options = list(string.ascii_letters)
-    for i in string.punctuation:
-        char_options.append(i)
+    char_options = Password_Encryption.get_chars()
+    #char_options = list(string.ascii_letters)
+    #for i in string.punctuation:
+    #    char_options.append(i)
     while True:
         try:
             length = int(input('Enter preferred length:'))
