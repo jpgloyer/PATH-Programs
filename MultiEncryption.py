@@ -196,6 +196,7 @@ def initialize_database():
     for i in users:
         unencrypted_document = unencrypted_document + "2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n" + encrypted_default_user_data + '\n'
 
+    unencrypted_document = unencrypted_document[:-1]
 
     with open("OurPasswords.txt",'w') as NewFile:
         NewFile.write(('').join(encrypt(unencrypted_document,password_vals,key,get_chars())))
