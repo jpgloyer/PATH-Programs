@@ -194,7 +194,7 @@ def initialize_database():
         unencrypted_document = unencrypted_document + i + f': {counter}\n'
         counter += 1
     for i in users:
-        unencrypted_document = unencrypted_document + "Website: Username: Password:\n" + encrypted_default_user_data + '\n'
+        unencrypted_document = unencrypted_document + "2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n" + encrypted_default_user_data + '\n'
 
 
     with open("OurPasswords.txt",'w') as NewFile:
@@ -213,7 +213,7 @@ def initialize_database():
 def reencrypt(file_sections,group_password):
     unencrypted_string = file_sections[0]
     for i in file_sections[1:]:
-        unencrypted_string = unencrypted_string + '\nWebsite: Username: Password:\n'
+        unencrypted_string = unencrypted_string + '\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n'
         unencrypted_string = unencrypted_string + i
     password_vals, key = get_vals_from_password(group_password,int(len(get_chars())/2-1))
     with open("OurPasswords.txt",'w') as UpdatedFile:
@@ -238,11 +238,9 @@ class PersonalInformation:
         while choice != 'q':
             print("0 - Reveal Password\n1 - Add Entry\n2 - Change Entry Password\n3 - Remove Entry\n4 - Change Personal Password")
             choice = input('Action ("q" to quit):')
-            try:
+            if choice == '0' or choice == '1' or choice == '2' or choice == '3' or choice == '4':
                 self.actions.get(choice)()
-            except:
-                print('Error in action select')
-
+    
     def reveal(self):
         print(''.ljust(5)+'Website:'.ljust(20) + 'Username:'.ljust(40))
         for i in range(len(self.unencrypted_information)):
@@ -342,14 +340,14 @@ def multi_encrypt_main():
     Password_Vals, key = get_vals_from_password(Master_Password,int(len(get_chars())/2-1))
     master_decrypted_message = decrypt(message_list_generator('OurPasswords.txt'),Password_Vals,key,get_chars())
     #File sections includes an unencrypted preamble containing information about the organization and user section ownership, as well as a section dedicated to each users' encrypted password list
-    file_sections = ('').join(master_decrypted_message).split('\nWebsite: Username: Password:\n')
+    file_sections = ('').join(master_decrypted_message).split('\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n')
 
     #Create user dictionary from file preamble:
     users = {}
     for line in file_sections[0].split('\n'):
        users[line.split(': ')[0]] = line.split(': ')[1]
-    for i in file_sections:
-        print(i)
+    #for i in file_sections:
+    #    print(i)
 
     #Personal decryption section
         #Username validation
@@ -368,7 +366,7 @@ def multi_encrypt_main():
     for i in range(len(Personal_Decrypted_Information)):
         Personal_Decrypted_Information[i] = Personal_Decrypted_Information[i].split(': ')
 
-
+    
     User = PersonalInformation(Personal_Decrypted_Information,personal_password)
     User.menu()
     file_sections[section_number] = User.save_changes()
