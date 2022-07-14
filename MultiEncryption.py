@@ -2,10 +2,14 @@ from email import message
 from getpass import getpass
 from colorama import init
 from termcolor import colored
-import string
 import random
 
 def get_chars():
+    '''
+    Simply generates a list of potential characters usable by the encryption and decryption functions
+    Changing the list between encryption and decryption will prevent decryption from working properly, but
+        if encryption and decryption are run using the same character list, it will work regardless of the list contents
+    '''
     #To be used once at the beginning of every run of the program
     #Simply generates a list of standard characters (numbers, lower and capital case letters)
     #Returns the completed list, doubled
@@ -31,6 +35,12 @@ def get_chars():
 
 
 def char_input_output(input_char, key, Character_List):
+    '''
+    input_char: character - character to be modified
+    key: int - number of spaces to shift the character along the...
+    character_list: list of characters - this list should contain every potential character twice (ie. [1,2,3,1,2,3])
+        list is used to translate input characters to output characters
+    '''
     #Takes in one input character that is searched for in the character list
     #Returns the position of the character in the list, shifted by the amount inputted as encryption_value
     index = 0
@@ -49,6 +59,9 @@ def char_input_output(input_char, key, Character_List):
     return Character_List[index+key]
 
 def message_list_generator(file_name):
+    '''
+    file_name: string - name or path of a text file that will be turned into a list of characters
+    '''
     character_list = []
     file = open(file_name, 'r')
     end_of_file = False
@@ -67,6 +80,11 @@ def message_list_generator(file_name):
     return character_list
 
 def get_vals_from_password(Password, max_key):
+    '''
+    password: string - user-inputted password to be used in the decryption/encryption processes
+    max_key: integer - equal to int(len(get_chars())/2-1)
+    ^^^ I don't know why I made this this way, but it's staying like this for a while probably. I might fix it someday
+    '''
     password_vals = []
     Letter_Nums = ''
     key = 0
@@ -91,6 +109,12 @@ def get_vals_from_password(Password, max_key):
     return password_vals, key
 
 def encrypt(message, password_values, key, Character_Reference_List):
+    '''
+    message: string - data to be encrypted
+    password_values: list of integers - generated from the get_vals_from_password() function
+    key: integer - generated from the get_vals_from_password() function
+    character_reference_list: list of characters - generated from the get_chars() function
+    '''
     encrypted_message = []
     #Converts message string to encrypted_message list of characters
     for i in message:
@@ -109,6 +133,12 @@ def encrypt(message, password_values, key, Character_Reference_List):
     return encrypted_message          
                     
 def decrypt(encrypted_message, password_values, key, Character_Reference_List):
+    '''
+    encrypted_message: string - data to be encrypted
+    password_values: list of integers - generated from the get_vals_from_password() function
+    key: integer - generated from the get_vals_from_password() function
+    character_reference_list: list of characters - generated from the get_chars() function
+    '''
     decrypted_message = []
     password_values.reverse()
     for i in encrypted_message:
@@ -201,15 +231,6 @@ def initialize_database():
     with open("OurPasswords.txt",'w') as NewFile:
         NewFile.write(('').join(encrypt(unencrypted_document,password_vals,key,get_chars())))
 
-    # with open("OurPasswords.txt",'w') as NewFile:
-    #     NewFile.write("Preamble: "+input("Group name:")+'\n')
-    #     counter = 1
-    #     for i in users:
-    #         NewFile.write(i+f': {counter}\n')
-    #         counter += 1
-    #     for i in users:
-    #         NewFile.write("Website: Username: Password:\n")
-    #         NewFile.write(encrypted_default_user_data+'\n')
 
 def reencrypt(file_sections,group_password):
     unencrypted_string = file_sections[0]
@@ -347,8 +368,6 @@ def multi_encrypt_main():
     users = {}
     for line in file_sections[0].split('\n'):
        users[line.split(': ')[0]] = line.split(': ')[1]
-    #for i in file_sections:
-    #    print(i)
 
     #Personal decryption section
         #Username validation
@@ -371,28 +390,12 @@ def multi_encrypt_main():
     User = PersonalInformation(Personal_Decrypted_Information,personal_password)
     User.menu()
     file_sections[section_number] = User.save_changes()
-    for i in file_sections:
-        print(i)
+    #for i in file_sections:
+    #    print(i)
 
     reencrypt(file_sections,Master_Password)
-
-
-    '''PROOF OF CONCEPT RIGHT HERE
-        The MasterEncrypted File needs to be expanded with a preamble and multiple different sections each encoded with multiple different passwords
-        The format should be similar to:
-
-        Unencrypted preamble here
-        Website: Username: Password:
-        ~~~~~~~~~
-        Website: Username: Password:
-        ~~~~~~~~~
-
-        where each ~~~~~~~~~ is user encrypted data and the preamble contains a computer-readable code for which username corresponds to which section
-
-        This entire file should then be encrypted with a Master Password
-
-    '''
 
 if __name__ == "__main__":
     multi_encrypt_main()
     #initialize_database()
+    #I desperately need to clean my s*** up
