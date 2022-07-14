@@ -210,7 +210,15 @@ def initialize_database():
     #         NewFile.write("Website: Username: Password:\n")
     #         NewFile.write(encrypted_default_user_data+'\n')
 
-#def rewrite_to_file():
+def reencrypt(file_sections,group_password):
+    unencrypted_string = file_sections[0]
+    for i in file_sections[1:]:
+        unencrypted_string = unencrypted_string + '\nWebsite: Username: Password:\n'
+        unencrypted_string = unencrypted_string + i
+    password_vals, key = get_vals_from_password(group_password,int(len(get_chars())/2-1))
+    with open("OurPasswords.txt",'w') as UpdatedFile:
+        UpdatedFile.write(('').join(encrypt(unencrypted_string,password_vals,key,get_chars())))
+
 
     
 
@@ -366,6 +374,8 @@ def multi_encrypt_main():
     file_sections[section_number] = User.save_changes()
     for i in file_sections:
         print(i)
+
+    reencrypt(file_sections,Master_Password)
 
 
     '''PROOF OF CONCEPT RIGHT HERE
