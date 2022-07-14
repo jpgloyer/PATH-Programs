@@ -168,6 +168,54 @@ def randomize_password():
     print('Your new password is: '+colored(str(new_password),'green'))
     return new_password
 
+def initialize_database():
+    users = []
+    default_user_data = "WebsiteHere: UsernameHere: PasswordHere:"
+
+    #Get number of users
+    try:
+        number_of_users = int(input("How many users?"))
+    except:
+        print("Enter a valid number")
+
+    #Collect initial usernames
+    for i in range(number_of_users):
+        users.append(input(f"Username({i}):"))
+    print("Default password for all users is 'Password'")
+
+    #encrypted_default_user_data will be inserted in every user's section
+    password_vals, key = get_vals_from_password('Password',int(len(get_chars())/2-1))
+    encrypted_default_user_data = ('').join(encrypt(default_user_data,password_vals,key,get_chars()))
+
+    unencrypted_document = ''
+    unencrypted_document = unencrypted_document + "Preamble: " + input("Group name:") + '\n'
+    counter = 1
+    for i in users:
+        unencrypted_document = unencrypted_document + i + f': {counter}\n'
+        counter += 1
+    for i in users:
+        unencrypted_document = unencrypted_document + "Website: Username: Password:\n" + encrypted_default_user_data + '\n'
+
+
+    with open("OurPasswords.txt",'w') as NewFile:
+        NewFile.write(('').join(encrypt(unencrypted_document,password_vals,key,get_chars())))
+
+    # with open("OurPasswords.txt",'w') as NewFile:
+    #     NewFile.write("Preamble: "+input("Group name:")+'\n')
+    #     counter = 1
+    #     for i in users:
+    #         NewFile.write(i+f': {counter}\n')
+    #         counter += 1
+    #     for i in users:
+    #         NewFile.write("Website: Username: Password:\n")
+    #         NewFile.write(encrypted_default_user_data+'\n')
+
+#def rewrite_to_file():
+
+    
+
+
+    
 
 class PersonalInformation:
     def __init__(self,unencrypted_information,encryption_password):
@@ -284,7 +332,8 @@ def multi_encrypt_main():
     #Decrypt a fully encoded file to allow individual, isolated user access
     Master_Password = getpass('Master Password:')
     Password_Vals, key = get_vals_from_password(Master_Password,int(len(get_chars())/2-1))
-    master_decrypted_message = decrypt(message_list_generator('MasterEncrypted3.txt'),Password_Vals,key,get_chars())
+    master_decrypted_message = decrypt(message_list_generator('OurPasswords.txt'),Password_Vals,key,get_chars())
+    #File sections includes an unencrypted preamble containing information about the organization and user section ownership, as well as a section dedicated to each users' encrypted password list
     file_sections = ('').join(master_decrypted_message).split('\nWebsite: Username: Password:\n')
 
     #Create user dictionary from file preamble:
@@ -310,7 +359,7 @@ def multi_encrypt_main():
     
     for i in range(len(Personal_Decrypted_Information)):
         Personal_Decrypted_Information[i] = Personal_Decrypted_Information[i].split(': ')
-    #print(Personal_Decrypted_Information)
+
 
     User = PersonalInformation(Personal_Decrypted_Information,personal_password)
     User.menu()
@@ -337,3 +386,4 @@ def multi_encrypt_main():
 
 if __name__ == "__main__":
     multi_encrypt_main()
+    #initialize_database()
