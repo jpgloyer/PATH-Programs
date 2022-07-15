@@ -200,7 +200,7 @@ def randomize_password():
 
 def initialize_database():
     users = []
-    default_user_data = "WebsiteHere: UsernameHere: PasswordHere:"
+    default_user_data = "Website: Username: Password: "
 
     #Get number of users
     try:
@@ -228,7 +228,7 @@ def initialize_database():
 
     unencrypted_document = unencrypted_document[:-1]
 
-    with open("OurPasswords.txt",'w') as NewFile:
+    with open("OurPasswordsTest.txt",'w') as NewFile:
         NewFile.write(('').join(encrypt(unencrypted_document,password_vals,key,get_chars())))
 
 
@@ -238,7 +238,7 @@ def reencrypt(file_sections,group_password):
         unencrypted_string = unencrypted_string + '\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n'
         unencrypted_string = unencrypted_string + i
     password_vals, key = get_vals_from_password(group_password,int(len(get_chars())/2-1))
-    with open("OurPasswords.txt",'w') as UpdatedFile:
+    with open("OurPasswordsTest.txt",'w') as UpdatedFile:
         UpdatedFile.write(('').join(encrypt(unencrypted_string,password_vals,key,get_chars())))
 
 
@@ -262,18 +262,31 @@ class PersonalInformation:
             choice = input('Action ("q" to quit):')
             if choice == '0' or choice == '1' or choice == '2' or choice == '3' or choice == '4':
                 self.actions.get(choice)()
+
+    def test_password(self):
+        print('test')
+        if self.unencrypted_information[0] == ["Website","Username","Password",'']:
+            print('true')
+            return True
+        else:     
+            print(self.unencrypted_information[0])   
+            print("False")
+            return False
+
     
     def reveal(self):
         print(''.ljust(5)+'Website:'.ljust(20) + 'Username:'.ljust(40))
         for i in range(len(self.unencrypted_information)):
-            print(f'{i}:'.ljust(5) + f'{self.unencrypted_information[i][0]}'.ljust(20,'-') + f'{self.unencrypted_information[i][1]}'.ljust(40))
+            if i != 0:
+                print(f'{i}:'.ljust(5) + f'{self.unencrypted_information[i][0]}'.ljust(20,'-') + f'{self.unencrypted_information[i][1]}'.ljust(40))
         password_choice = input('Select password number to reveal:')
-        #print('-----------------------------------------')
-        #Print entry info
         print('\n\n')
-        print(f'Website:'.ljust(14) + f'{self.unencrypted_information[int(password_choice)][0]}'.ljust(30) + '\n'
-            f'Username:'.ljust(15) + f'{self.unencrypted_information[int(password_choice)][1]}'.ljust(30) + '\n'
-            +f'Password:'.ljust(14) + colored(f'{self.unencrypted_information[int(password_choice)][2]}'.ljust(30),color='red',attrs=['bold']))
+        try:
+            print(f'Website:'.ljust(14) + f'{self.unencrypted_information[int(password_choice)][0]}'.ljust(30) + '\n'
+                f'Username:'.ljust(15) + f'{self.unencrypted_information[int(password_choice)][1]}'.ljust(30) + '\n'
+                +f'Password:'.ljust(14) + colored(f'{self.unencrypted_information[int(password_choice)][2]}'.ljust(30),color='red',attrs=['bold']))
+        except:
+            print("Invalid choice")
         print('\n\n')
 
     def add_entry(self):
@@ -360,7 +373,7 @@ def multi_encrypt_main():
     #Decrypt a fully encoded file to allow individual, isolated user access
     Master_Password = getpass('Master Password:')
     Password_Vals, key = get_vals_from_password(Master_Password,int(len(get_chars())/2-1))
-    master_decrypted_message = decrypt(message_list_generator('OurPasswords.txt'),Password_Vals,key,get_chars())
+    master_decrypted_message = decrypt(message_list_generator('OurPasswordsTest.txt'),Password_Vals,key,get_chars())
     #File sections includes an unencrypted preamble containing information about the organization and user section ownership, as well as a section dedicated to each users' encrypted password list
     file_sections = ('').join(master_decrypted_message).split('\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n')
 
@@ -388,10 +401,10 @@ def multi_encrypt_main():
 
     
     User = PersonalInformation(Personal_Decrypted_Information,personal_password)
-    User.menu()
+    if User.test_password() == True:
+        User.menu()
     file_sections[section_number] = User.save_changes()
-    #for i in file_sections:
-    #    print(i)
+    
 
     reencrypt(file_sections,Master_Password)
 
