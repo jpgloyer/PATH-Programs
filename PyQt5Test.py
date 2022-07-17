@@ -96,6 +96,7 @@ class App(QtWidgets.QWidget):
         self
 
     def change_entry(self):
+        self.Database.save_changes()
         self
 
     def remove_entry(self):
@@ -111,4 +112,7 @@ if __name__=='__main__':
     Database = MasterDatabase('OurPasswords.txt')
     app=QApplication(sys.argv)    
     ex=App(Database)
-    sys.exit(app.exec_())
+    #sys.exit(app.exec_())
+    app.exec_()
+    print(Database.save_changes())
+    Database.reencrypt()
