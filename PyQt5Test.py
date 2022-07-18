@@ -1,7 +1,8 @@
 from email.charset import QP
+from pickle import TRUE
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QInputDialog, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QInputDialog, QMainWindow, QMessageBox, QListWidget, QListWidgetItem, QScrollBar
 from MultiEncryptionOneClass import MasterDatabase
 
 
@@ -23,6 +24,8 @@ class App(QtWidgets.QWidget):
         self.setGeometry(self.left,self.top,self.width,self.height)
         
         
+
+        #THIS NEEDS TO BE MOVED
         master_password, m_pw_done = QInputDialog.getText(self, 'Master Password', 'Enter Master Password:')
         self.Database.input_master_password(master_password)
         username, un_done = QInputDialog.getText(self,'Username', 'Enter Username:')
@@ -34,37 +37,42 @@ class App(QtWidgets.QWidget):
         self.Database.decrypt('Personal',self.Database.file_sections[int(Database.users[Database.username])])
         self.Database.make_personal_info_list()
 
-        #Everything I need for one button
-        self.button=QPushButton('Test',self)
-        self.button.clicked.connect(self.take_input)
-        self.button.move(0,0)
-
         #Reveal button
         self.reveal=QPushButton('Reveal Password',self)
         self.reveal.clicked.connect(self.reveal_password)
         self.reveal.move(0,100)
+        self.reveal.resize(200,25)
 
         #Add entry button
-        self.reveal=QPushButton('Add Entry',self)
-        self.reveal.clicked.connect(self.add_entry)
-        self.reveal.move(0,150)
+        self.add=QPushButton('Add Entry',self)
+        self.add.clicked.connect(self.add_entry)
+        self.add.move(0,150)
+        self.add.resize(200,25)
 
         #Change Entry Password
-        self.reveal=QPushButton('Change Entry',self)
-        self.reveal.clicked.connect(self.change_entry)
-        self.reveal.move(0,200)
+        self.change_entry_password=QPushButton('Change Entry',self)
+        self.change_entry_password.clicked.connect(self.change_entry)
+        self.change_entry_password.move(0,200)
+        self.change_entry_password.resize(200,25)
 
         #Remove Entry
-        self.reveal=QPushButton('Remove Entry',self)
-        self.reveal.clicked.connect(self.remove_entry)
-        self.reveal.move(0,250)
+        self.remove=QPushButton('Remove Entry',self)
+        self.remove.clicked.connect(self.remove_entry)
+        self.remove.move(0,250)
+        self.remove.resize(200,25)
 
         #Change personal password
-        self.reveal=QPushButton('Change Personal Password',self)
-        self.reveal.clicked.connect(self.change_personal_password)
-        self.reveal.move(0,300)
+        self.change_personal_password_button=QPushButton('Change Personal Password',self)
+        self.change_personal_password_button.clicked.connect(self.change_personal_password)
+        self.change_personal_password_button.move(0,300)
+        self.change_personal_password_button.resize(200,25)
 
-
+        self.list_widget = QListWidget(self)
+        self.list_widget.setGeometry(250,100,200,200)
+        #self.list_widget.addItem(QListWidgetItem("A"))
+        #self.list_widget.itemActivated
+        for i in self.Database.personal_info_list:
+            self.list_widget.addItem(QListWidgetItem(f'{i[0]}'))
 
         self.show()
 
@@ -76,34 +84,63 @@ class App(QtWidgets.QWidget):
             return 'Canceled'
 
     def reveal_password(self):
-        message_text = ''
-        for i in range(len(self.Database.personal_info_list)):
-            message_text = message_text + f'{i}: '
-            message_text = message_text + self.Database.personal_info_list[i][0]
-
-            message_text = message_text + '\n'
-        password_selection, reveal_done = QInputDialog.getText(self, 'Reveal Password:',message_text)
         message = QMessageBox()
-        message.setWindowTitle('Password')
-        message.setText(('\t\n').join(self.Database.personal_info_list[int(password_selection)]))
+        for i in self.Database.personal_info_list:
+            #print(i)
+            if self.list_widget.selectedItems()[0].text() == i[0]:
+                message.setText(f"Website: {i[0]}\nUsername: {i[1]}\nPassword: {i[2]}")
         message.exec()
+        pass
 
     def add_entry(self):
-        website, w_done = QInputDialog.getText(self,'Website:','Which Website is this Entry For?')
+        website_used = True
+        while website_used == True:
+            website, w_done = QInputDialog.getText(self,'Website:','Which Website is this Entry For?')
+            website_in_list = False
+            for i in self.Database.personal_info_list:
+                if i[0] == website:
+                    website_in_list = True
+                    alert = QMessageBox()
+                    alert.setText(f'Entry for {website} already present in personal database.\nUse "username@website" to store multiple accounts\' information.')
+                    alert.exec()
+            if website_in_list == False:
+                website_used = False
+
+        
         username, u_done = QInputDialog.getText(self,'Username:',f'Enter your Username for {website}:')
         password, p_done = QInputDialog.getText(self, 'Password:',f'Enter Password for {website}:')
         self.Database.personal_info_list.append([website,username,password])
-        self
+        self.list_widget.addItem(QListWidgetItem(website))
+        pass
+        
 
     def change_entry(self):
-        self.Database.save_changes()
+        entry_to_change = self.list_widget.selectedItems()[0].text()
+        for i in range(len(self.Database.personal_info_list)):
+            if entry_to_change == self.Database.personal_info_list[i][0]:
+                new_password, np_done = QInputDialog.getText(self,'New Password',f'Enter {self.Database.personal_info_list[i][1]}\' new password for {self.Database.personal_info_list[i][0]}:')
+            self.Database.personal_info_list[i][2] = new_password
         self
 
     def remove_entry(self):
-        self
+        entry_to_remove = self.list_widget.selectedItems()[0].text()
+        for i in self.Database.personal_info_list:
+            if entry_to_remove == i[0]:
+                confirmation, c_done = QInputDialog.getText(self,'CONFIRM',f'Type "CONFIRM" to delete {i[1]}\'s {i[0]} password entry:')
+                if confirmation == 'CONFIRM':
+                    personal_info_list = []
+                    for j in self.Database.personal_info_list:
+                        if j != i:
+                            personal_info_list.append(j)
+                    self.Database.personal_info_list = personal_info_list
+                    self.list_widget.takeItem(self.list_widget.row(self.list_widget.selectedItems()[0]))
+                    #self.list_widget.item(self.list_widget.row(self.list_widget.selectedItems()[0])).setSelected(False)
+        pass
 
     def change_personal_password(self):
-        self
+        personal_password, pp_done = QInputDialog.getText(self, 'Personal Password', 'Enter Personal Password:')
+        self.Database.input_personal_password(personal_password)
+        pass
 
 
 
@@ -114,5 +151,5 @@ if __name__=='__main__':
     ex=App(Database)
     #sys.exit(app.exec_())
     app.exec_()
-    print(Database.save_changes())
+    Database.save_changes()
     Database.reencrypt()
