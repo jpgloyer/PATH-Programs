@@ -2,8 +2,9 @@ from email.charset import QP
 from pickle import TRUE
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QInputDialog, QMainWindow, QMessageBox, QListWidget, QListWidgetItem, QScrollBar
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QInputDialog, QMainWindow, QMessageBox, QListWidget, QListWidgetItem
 from MultiEncryptionOneClass import MasterDatabase
+import pyperclip
 
 
 class App(QtWidgets.QWidget):
@@ -15,28 +16,45 @@ class App(QtWidgets.QWidget):
         self.width=640
         self.height=480
         self.Database = Database
-        self.initUI()
+        m_pw_done = False
+        un_done = False
+        p_pw_done = False
 
+        #Validate Master Password
+        while not m_pw_done:
+            master_password, m_pw_done = QInputDialog.getText(self, 'Master Password', 'Enter Master Password:')
+            self.Database.input_master_password(master_password)
+            self.Database.decrypt('Master',self.Database.message_list_generator())
+            if self.Database.decrypted_master_message.find('Preamble:') == -1:
+                m_pw_done = False
+
+        self.Database.split_file_information()
+
+        #Validate Username
+        while not un_done:
+            try:
+                username, un_done = QInputDialog.getText(self,'Username', 'Enter Username:')
+                self.Database.input_username(username)
+                self.Database.users[self.Database.username]
+            except:
+                un_done = False
+        
+        #Validate Personal Password
+        while not p_pw_done:
+            personal_password, p_pw_done = QInputDialog.getText(self, 'Personal Password', 'Enter Personal Password:')
+            self.Database.input_personal_password(personal_password)
+            self.Database.decrypt('Personal',self.Database.file_sections[int(self.Database.users[self.Database.username])])
+            if self.Database.decrypted_personal_message.find('Website: Username: Password:') == -1:
+                p_pw_done = False
+
+        self.Database.make_personal_info_list()
+    
+        self.initUI()
     
     def initUI(self):
-        #Button dimensions: (x=90,y=25)
         self.setWindowTitle(self.title)
         self.setGeometry(self.left,self.top,self.width,self.height)
         
-        
-
-        #THIS NEEDS TO BE MOVED
-        master_password, m_pw_done = QInputDialog.getText(self, 'Master Password', 'Enter Master Password:')
-        self.Database.input_master_password(master_password)
-        username, un_done = QInputDialog.getText(self,'Username', 'Enter Username:')
-        self.Database.input_username(username)
-        personal_password, pp_done = QInputDialog.getText(self, 'Personal Password', 'Enter Personal Password:')
-        self.Database.input_personal_password(personal_password)
-        self.Database.decrypt('Master',Database.message_list_generator())
-        self.Database.split_file_information()
-        self.Database.decrypt('Personal',self.Database.file_sections[int(Database.users[Database.username])])
-        self.Database.make_personal_info_list()
-
         #Reveal button
         self.reveal=QPushButton('Reveal Password',self)
         self.reveal.clicked.connect(self.reveal_password)
@@ -69,9 +87,7 @@ class App(QtWidgets.QWidget):
 
         self.list_widget = QListWidget(self)
         self.list_widget.setGeometry(250,100,200,200)
-        #self.list_widget.addItem(QListWidgetItem("A"))
-        #self.list_widget.itemActivated
-        for i in self.Database.personal_info_list:
+        for i in self.Database.personal_info_list[1:]:
             self.list_widget.addItem(QListWidgetItem(f'{i[0]}'))
 
         self.show()
@@ -90,9 +106,11 @@ class App(QtWidgets.QWidget):
             if self.list_widget.selectedItems()[0].text() == i[0]:
                 message.setText(f"Website: {i[0]}\nUsername: {i[1]}\nPassword: {i[2]}")
         message.exec()
+        pyperclip.copy(i[2])
         pass
 
     def add_entry(self):
+        #ADD INPUT VALIDATION
         website_used = True
         while website_used == True:
             website, w_done = QInputDialog.getText(self,'Website:','Which Website is this Entry For?')
@@ -105,8 +123,6 @@ class App(QtWidgets.QWidget):
                     alert.exec()
             if website_in_list == False:
                 website_used = False
-
-        
         username, u_done = QInputDialog.getText(self,'Username:',f'Enter your Username for {website}:')
         password, p_done = QInputDialog.getText(self, 'Password:',f'Enter Password for {website}:')
         self.Database.personal_info_list.append([website,username,password])
@@ -119,7 +135,8 @@ class App(QtWidgets.QWidget):
         for i in range(len(self.Database.personal_info_list)):
             if entry_to_change == self.Database.personal_info_list[i][0]:
                 new_password, np_done = QInputDialog.getText(self,'New Password',f'Enter {self.Database.personal_info_list[i][1]}\' new password for {self.Database.personal_info_list[i][0]}:')
-            self.Database.personal_info_list[i][2] = new_password
+                if np_done and new_password:
+                    self.Database.personal_info_list[i][2] = new_password
         self
 
     def remove_entry(self):
@@ -153,3 +170,4 @@ if __name__=='__main__':
     app.exec_()
     Database.save_changes()
     Database.reencrypt()
+
