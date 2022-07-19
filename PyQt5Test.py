@@ -1,5 +1,6 @@
 from email.charset import QP
 from pickle import TRUE
+from re import U
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QInputDialog, QMainWindow, QMessageBox, QListWidget, QListWidgetItem
@@ -19,6 +20,7 @@ class App(QtWidgets.QWidget):
         m_pw_done = False
         un_done = False
         p_pw_done = False
+        attempts_remaining = 3
 
         #Validate Master Password
         while not m_pw_done:
@@ -26,10 +28,17 @@ class App(QtWidgets.QWidget):
             self.Database.input_master_password(master_password)
             self.Database.decrypt('Master',self.Database.message_list_generator())
             if self.Database.decrypted_master_message.find('Preamble:') == -1:
+                message = QMessageBox()
+                attempts_remaining -= 1
+                message.setText(f"INCORRECT PASSWORD\n{attempts_remaining} attempts remaining")
+                message.exec()
+                if attempts_remaining == 0:
+                    exit()
                 m_pw_done = False
 
         self.Database.split_file_information()
 
+        attempts_remaining = 3
         #Validate Username
         while not un_done:
             try:
@@ -37,14 +46,27 @@ class App(QtWidgets.QWidget):
                 self.Database.input_username(username)
                 self.Database.users[self.Database.username]
             except:
+                message = QMessageBox()
+                attempts_remaining -= 1
+                message.setText(f"INVALID USERNAME\n{attempts_remaining} attempts remaining")
+                message.exec()
+                if attempts_remaining == 0:
+                    exit()
                 un_done = False
         
+        attempts_remaining = 3
         #Validate Personal Password
         while not p_pw_done:
             personal_password, p_pw_done = QInputDialog.getText(self, 'Personal Password', 'Enter Personal Password:')
             self.Database.input_personal_password(personal_password)
             self.Database.decrypt('Personal',self.Database.file_sections[int(self.Database.users[self.Database.username])])
             if self.Database.decrypted_personal_message.find('Website: Username: Password:') == -1:
+                message = QMessageBox()
+                attempts_remaining -= 1
+                message.setText(f'INCORRECT PASSWORD\n{attempts_remaining} attempts remaining')
+                message.exec()
+                if attempts_remaining == 0:
+                    exit()
                 p_pw_done = False
 
         self.Database.make_personal_info_list()
@@ -110,23 +132,35 @@ class App(QtWidgets.QWidget):
         pass
 
     def add_entry(self):
-        #ADD INPUT VALIDATION
         website_used = True
+        w_done = True
+        u_done = True
+        p_done = True
+        website = ''
+        username = ''
+        password = ''
         while website_used == True:
-            website, w_done = QInputDialog.getText(self,'Website:','Which Website is this Entry For?')
-            website_in_list = False
-            for i in self.Database.personal_info_list:
-                if i[0] == website:
-                    website_in_list = True
-                    alert = QMessageBox()
-                    alert.setText(f'Entry for {website} already present in personal database.\nUse "username@website" to store multiple accounts\' information.')
-                    alert.exec()
-            if website_in_list == False:
-                website_used = False
-        username, u_done = QInputDialog.getText(self,'Username:',f'Enter your Username for {website}:')
-        password, p_done = QInputDialog.getText(self, 'Password:',f'Enter Password for {website}:')
-        self.Database.personal_info_list.append([website,username,password])
-        self.list_widget.addItem(QListWidgetItem(website))
+            while website == '' and w_done:
+                website, w_done = QInputDialog.getText(self,'Website:','Which Website is this Entry For?')
+                website_in_list = False
+                for i in self.Database.personal_info_list:
+                    if i[0] == website:
+                        website_in_list = True
+                        alert = QMessageBox()
+                        alert.setText(f'Entry for {website} already present in personal database.\nUse "username@website" to store multiple accounts\' information.')
+                        alert.exec()
+                        website = ''
+                if website_in_list == False:
+                    website_used = False
+        if w_done:
+            while username == '' and u_done:
+                username, u_done = QInputDialog.getText(self,'Username:',f'Enter your Username for {website}:')
+            if u_done:
+                while password == '' and p_done:
+                    password, p_done = QInputDialog.getText(self, 'Password:',f'Enter Password for {website}:')
+                if p_done:
+                    self.Database.personal_info_list.append([website,username,password])
+                    self.list_widget.addItem(QListWidgetItem(website))
         pass
         
 
