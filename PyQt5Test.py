@@ -1,6 +1,9 @@
-from email.charset import QP
-from pickle import TRUE
-from re import U
+#Add system to save a local unencrypted text file containing the file location for the passwords document, allowing the user to import a network based file
+
+
+#from email.charset import QP
+#from pickle import TRUE
+#from re import U
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QInputDialog, QMainWindow, QMessageBox, QListWidget, QListWidgetItem
@@ -107,6 +110,12 @@ class App(QtWidgets.QWidget):
         self.change_personal_password_button.move(0,300)
         self.change_personal_password_button.resize(200,25)
 
+        #Credits button
+        self.credits = QPushButton('Credits',self)
+        self.credits.clicked.connect(self.credits_message)
+        self.credits.move(590,455)
+        self.credits.resize(50,25)
+
         self.list_widget = QListWidget(self)
         self.list_widget.setGeometry(250,100,200,200)
         for i in self.Database.personal_info_list[1:]:
@@ -114,21 +123,18 @@ class App(QtWidgets.QWidget):
 
         self.show()
 
-    def take_input(self):
-        user_input, done = QInputDialog.getText(self,'Test','Enter test info:')
-        if done:
-            return user_input
-        else:
-            return 'Canceled'
-
     def reveal_password(self):
         message = QMessageBox()
-        for i in self.Database.personal_info_list:
-            #print(i)
-            if self.list_widget.selectedItems()[0].text() == i[0]:
-                message.setText(f"Website: {i[0]}\nUsername: {i[1]}\nPassword: {i[2]}")
-        message.exec()
-        pyperclip.copy(i[2])
+        if self.list_widget.selectedItems():
+            for i in self.Database.personal_info_list:
+                #print(i)
+                if self.list_widget.selectedItems()[0].text() == i[0]:
+                    message.setText(f"Website: {i[0]}\nUsername: {i[1]}\nPassword: {i[2]}")
+                    message.exec()
+                    copy_to_clipboard = QMessageBox.question(self,'Copy password to clipboard?', 'Copy password to clipboard?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                    if copy_to_clipboard == QMessageBox.Yes:
+                        pyperclip.copy(i[2])
+            
         pass
 
     def add_entry(self):
@@ -192,6 +198,11 @@ class App(QtWidgets.QWidget):
         personal_password, pp_done = QInputDialog.getText(self, 'Personal Password', 'Enter Personal Password:')
         self.Database.input_personal_password(personal_password)
         pass
+
+    def credits_message(self):
+        message = QMessageBox()
+        message.setText('Written by Pierce Gloyer')
+        message.exec()
 
 
 
