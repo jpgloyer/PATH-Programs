@@ -124,17 +124,13 @@ class App(QtWidgets.QWidget):
         self.show()
 
     def reveal_password(self):
-        message = QMessageBox()
         if self.list_widget.selectedItems():
             for i in self.Database.personal_info_list:
                 #print(i)
                 if self.list_widget.selectedItems()[0].text() == i[0]:
-                    message.setText(f"Website: {i[0]}\nUsername: {i[1]}\nPassword: {i[2]}")
-                    message.exec()
-                    copy_to_clipboard = QMessageBox.question(self,'Copy password to clipboard?', 'Copy password to clipboard?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                    copy_to_clipboard = QMessageBox.question(self,'Copy password to clipboard?', f"Website: {i[0]}\nUsername: {i[1]}\nPassword: {i[2]}\n\nCopy password to clipboard?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
                     if copy_to_clipboard == QMessageBox.Yes:
                         pyperclip.copy(i[2])
-            
         pass
 
     def add_entry(self):
