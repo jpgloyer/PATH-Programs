@@ -11,10 +11,11 @@ from MultiEncryptionOneClass import MasterDatabase
 import pyperclip
 
 
+
 class App(QtWidgets.QWidget):
     def __init__(self,Database):
         super().__init__()
-        self.title='Hello, world!'
+        self.title='Password Manager'
         self.left=600
         self.top=400
         self.width=640
@@ -23,11 +24,23 @@ class App(QtWidgets.QWidget):
         m_pw_done = False
         un_done = False
         p_pw_done = False
-        attempts_remaining = 3
+        
+
+        # self.ps = QtWidgets.QLineEdit(self)
+        # self.ps.setWindowTitle("Enter Password")
+        # self.ps.setEchoMode(QtWidgets.QLineEdit.Password)
+        # self.ps.resize(200,200)
+        # self.ps.show()
+        # print(self.ps.text())
+
+
 
         #Validate Master Password
+        attempts_remaining = 3
         while not m_pw_done:
             master_password, m_pw_done = QInputDialog.getText(self, 'Master Password', 'Enter Master Password:')
+            if not m_pw_done:
+                exit()
             self.Database.input_master_password(master_password)
             self.Database.decrypt('Master',self.Database.message_list_generator())
             if self.Database.decrypted_master_message.find('Preamble:') == -1:
@@ -41,11 +54,14 @@ class App(QtWidgets.QWidget):
 
         self.Database.split_file_information()
 
-        attempts_remaining = 3
+        
         #Validate Username
+        attempts_remaining = 3
         while not un_done:
+            username, un_done = QInputDialog.getText(self,'Username', 'Enter Username:')
+            if not un_done:
+                exit()
             try:
-                username, un_done = QInputDialog.getText(self,'Username', 'Enter Username:')
                 self.Database.input_username(username)
                 self.Database.users[self.Database.username]
             except:
@@ -57,10 +73,13 @@ class App(QtWidgets.QWidget):
                     exit()
                 un_done = False
         
-        attempts_remaining = 3
+
         #Validate Personal Password
+        attempts_remaining = 3
         while not p_pw_done:
             personal_password, p_pw_done = QInputDialog.getText(self, 'Personal Password', 'Enter Personal Password:')
+            if not p_pw_done:
+                exit()
             self.Database.input_personal_password(personal_password)
             self.Database.decrypt('Personal',self.Database.file_sections[int(self.Database.users[self.Database.username])])
             if self.Database.decrypted_personal_message.find('Website: Username: Password:') == -1:
@@ -73,7 +92,8 @@ class App(QtWidgets.QWidget):
                 p_pw_done = False
 
         self.Database.make_personal_info_list()
-    
+
+        self.title = f"{self.Database.users['Preamble']} Password Manager"
         self.initUI()
     
     def initUI(self):
@@ -113,13 +133,19 @@ class App(QtWidgets.QWidget):
         #Credits button
         self.credits = QPushButton('Credits',self)
         self.credits.clicked.connect(self.credits_message)
-        self.credits.move(590,455)
-        self.credits.resize(50,25)
+        self.credits.move(540,455)
+        self.credits.resize(100,25)
 
         self.list_widget = QListWidget(self)
         self.list_widget.setGeometry(250,100,200,200)
         for i in self.Database.personal_info_list[1:]:
             self.list_widget.addItem(QListWidgetItem(f'{i[0]}'))
+
+        if self.Database.users[self.Database.username] == '1':
+            self.admin_button = QPushButton('Admin options',self)
+            self.admin_button.clicked.connect(self.admin_options)
+            self.admin_button.move(540,430)
+            self.admin_button.resize(100,25)
 
         self.show()
 
@@ -199,6 +225,10 @@ class App(QtWidgets.QWidget):
         message = QMessageBox()
         message.setText('Written by Pierce Gloyer')
         message.exec()
+        self.Database.test_master_decryption('Passwor')
+
+    def admin_options(self):
+        pass
 
 
 

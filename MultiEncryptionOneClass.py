@@ -175,6 +175,9 @@ class MasterDatabase():
         elif doc_type == 'Personal':
             key = self.p_pw_key
             password_values = self.p_pw_vals
+        elif doc_type == 'Temp':
+            key = self.temp_key
+            password_values = self.temp_password_vals
         decrypted_message = []
         password_values.reverse()
         for i in encrypted_message:
@@ -195,6 +198,16 @@ class MasterDatabase():
         elif doc_type == 'Personal':
             self.decrypted_personal_message = ('').join(decrypted_message)
         return decrypted_message
+
+    def test__master_decryption(self,password: str):
+        self.temp_password_vals, self.temp_key = self.get_vals_from_password(password)
+        message = self.decrypt('Temp',self.message_list_generator())
+        if ('').join(message).find('Preamble') != -1:
+            return True
+        else:
+            return False
+
+
 
     def randomize_password(self):
         new_password = ''
@@ -250,7 +263,7 @@ class MasterDatabase():
             unencrypted_document = unencrypted_document + "2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n" + encrypted_default_user_data + '\n'
 
         unencrypted_document = unencrypted_document[:-1]
-
+ 
         with open("OurPasswordsTest.txt",'w') as NewFile:
             NewFile.write(('').join(self.encrypt('Temp',unencrypted_document)))
         pass
@@ -270,6 +283,7 @@ class MasterDatabase():
             self.personal_info_list.append(i)
         for i in range(len(self.personal_info_list)):
             self.personal_info_list[i] = self.personal_info_list[i].split(': ')
+        self.personal_info_list[1:] = sorted(self.personal_info_list[1:],key=lambda x: x[0].lower())
         return self.personal_info_list
 
     def save_changes(self):
