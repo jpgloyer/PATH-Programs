@@ -9,6 +9,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QInputDialog, QMainWindow, QMessageBox, QListWidget, QListWidgetItem
 from MultiEncryptionOneClass import MasterDatabase
 import pyperclip
+from Login import Login
 
 
 
@@ -25,17 +26,9 @@ class App(QtWidgets.QWidget):
         un_done = False
         p_pw_done = False
         
+        self.login_screen()
 
-        # self.ps = QtWidgets.QLineEdit(self)
-        # self.ps.setWindowTitle("Enter Password")
-        # self.ps.setEchoMode(QtWidgets.QLineEdit.Password)
-        # self.ps.resize(200,200)
-        # self.ps.show()
-        # print(self.ps.text())
-
-
-
-        #Validate Master Password
+        '''#Validate Master Password
         attempts_remaining = 3
         while not m_pw_done:
             master_password, m_pw_done = QInputDialog.getText(self, 'Master Password', 'Enter Master Password:')
@@ -52,10 +45,10 @@ class App(QtWidgets.QWidget):
                     exit()
                 m_pw_done = False
 
-        self.Database.split_file_information()
+        self.Database.split_file_information()'''
 
         
-        #Validate Username
+        '''#Validate Username
         attempts_remaining = 3
         while not un_done:
             username, un_done = QInputDialog.getText(self,'Username', 'Enter Username:')
@@ -71,10 +64,10 @@ class App(QtWidgets.QWidget):
                 message.exec()
                 if attempts_remaining == 0:
                     exit()
-                un_done = False
+                un_done = False'''
         
 
-        #Validate Personal Password
+        '''#Validate Personal Password
         attempts_remaining = 3
         while not p_pw_done:
             personal_password, p_pw_done = QInputDialog.getText(self, 'Personal Password', 'Enter Personal Password:')
@@ -93,9 +86,76 @@ class App(QtWidgets.QWidget):
 
         self.Database.make_personal_info_list()
 
-        self.title = f"{self.Database.users['Preamble']} Password Manager"
+        self.title = f"{self.Database.users['Preamble']} Password Manager"'''
+        self.Database.make_personal_info_list()
         self.initUI()
     
+
+    def login_screen(self):
+        correct_credentials = False
+        screen = Login()
+        screen.attempts_remaining = 3
+        
+        while not correct_credentials and screen.attempts_remaining > 0:
+            
+            screen.exec()
+            
+            m_pass = screen.get_mpass()
+            uname = screen.get_uname()
+            ppass = screen.get_ppass()
+
+            #Master Password Validation
+            correct_master = False
+            self.Database.input_master_password(m_pass)
+            self.Database.decrypt('Master',self.Database.message_list_generator())
+            if self.Database.decrypted_master_message.find('Preamble:') != -1:
+                correct_master = True
+
+            #Username Validation
+            valid_user = False
+            if correct_master:
+                self.Database.split_file_information()
+                try:
+                    self.Database.input_username(uname)
+                    self.Database.users[self.Database.username]
+                    valid_user = True
+                except:
+                    pass
+
+            #User Password Validation
+            correct_personal = False
+            if valid_user:
+                self.Database.input_personal_password(ppass)
+                self.Database.decrypt('Personal',self.Database.file_sections[int(self.Database.users[self.Database.username])])
+                if self.Database.decrypted_personal_message.find('Website: Username: Password:') != -1:
+                    correct_personal = True
+            
+
+            #Results
+            if correct_master and valid_user and correct_personal:
+                correct_credentials = True
+                screen.accept()
+            elif not correct_master and screen.attempts_remaining >= 0:
+                screen.attempts_remaining -= 1
+                message = QMessageBox()
+                message.setText(f"INVALID MASTER PASSWORD\n{screen.attempts_remaining} attempts remaining")
+                message.exec()
+            elif not valid_user and screen.attempts_remaining >= 0:
+                screen.attempts_remaining -= 1
+                message = QMessageBox()
+                message.setText(f"INVALID USERNAME\n{screen.attempts_remaining} attempts remaining")
+                message.exec()
+            elif not correct_personal and screen.attempts_remaining >= 0:
+                screen.attempts_remaining -= 1
+                message = QMessageBox()
+                message.setText(f"INVALID PERSONAL PASSWORD\n{screen.attempts_remaining} attempts remaining")
+                message.exec()
+
+        
+        if screen.attempts_remaining <= 0:
+            exit()
+
+
     def initUI(self):
         self.setWindowTitle(self.title)
         self.setGeometry(self.left,self.top,self.width,self.height)

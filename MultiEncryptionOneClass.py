@@ -199,13 +199,30 @@ class MasterDatabase():
             self.decrypted_personal_message = ('').join(decrypted_message)
         return decrypted_message
 
-    def test__master_decryption(self,password: str):
+
+
+#Probably just delete
+    def test_master_decryption(self,password: str, username: str, p_password: str):
         self.temp_password_vals, self.temp_key = self.get_vals_from_password(password)
         message = self.decrypt('Temp',self.message_list_generator())
         if ('').join(message).find('Preamble') != -1:
-            return True
+            self.decrypt('Master',self.message_list_generator())
+            file_sections, users = self.split_file_information(test=True)
+            try:
+                users[username]
+            except:
+                return "Invalid Username"
+            if self.decrypt('Temp',file_sections[users[username]]).find('Website: Username: Password: ') != -1:
+            #Split file information to temp variable and test for username
+            #If username is correct:
+                #decrypt username's information to temp variable and look for "Website: Username: Password:"
+                #If found, return true
+                #At any 'else', return exit code with current test name
+                return "Success"
+            else:
+                return "Incorrect User Password"
         else:
-            return False
+            return "Incorrect Master Password"
 
 
 
@@ -274,6 +291,7 @@ class MasterDatabase():
         for line in self.file_sections[0].split('\n'):
             self.users[line.split(': ')[0]] = line.split(': ')[1]
         return self.file_sections,self.users
+
 
     #Personal Information Functions
 
