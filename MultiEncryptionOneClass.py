@@ -4,10 +4,21 @@ from termcolor import colored
 import random
 
 class MasterDatabase():
-    def __init__(self, file_name):
-        self.file_name = file_name
+    def __init__(self, database_location_file):
+        self.database_location_file = database_location_file
         self.Reference_Character_List = self.get_chars()
         self.max_key = int(len(self.Reference_Character_List)/2-1)
+        
+        with open(database_location_file) as File:
+            for line in File:
+                self.database_location = line
+        try:
+            with open(self.database_location):
+                pass
+        except:
+            self.database_location = 'Database.txt'
+            self.initialize_database(['User'],'FixMe')
+            
         self.message_list = self.message_list_generator()
         
 
@@ -59,7 +70,7 @@ class MasterDatabase():
         Returns encrypted list of characters
         '''
         message_list = []
-        file = open(self.file_name, 'r')
+        file = open(self.database_location, 'r')
         end_of_file = False
         while not end_of_file: 
             # read by character
@@ -133,6 +144,7 @@ class MasterDatabase():
         doc_type: str = 'Master' or 'Personal'
         '''
         if doc_type == 'Master':
+            self.m_pw_vals, self.m_pw_key = self.get_vals_from_password(self.master_password)
             key = self.m_pw_key
             password_values = self.m_pw_vals
         elif doc_type == 'Personal':
@@ -251,19 +263,20 @@ class MasterDatabase():
         
         return new_password
 
-    def initialize_database(self):
-        users = []
+    def initialize_database(self, users: list = [], group_name: str = ''):
+
         default_user_data = "Website: Username: Password: "
 
-        #Get number of users
-        try:
-            number_of_users = int(input("How many users?"))
-        except:
-            print("Enter a valid number")
+        if not users:
+            #Get number of users
+            try:
+                number_of_users = int(input("How many users?"))
+            except:
+                print("Enter a valid number")
 
-        #Collect initial usernames
-        for i in range(number_of_users):
-            users.append(input(f"Username({i}):"))
+            #Collect initial usernames
+            for i in range(number_of_users):
+                users.append(input(f"Username({i}):"))
 
 
         #encrypted_default_user_data will be inserted in every user's section
@@ -271,7 +284,10 @@ class MasterDatabase():
         encrypted_default_user_data = ('').join(self.encrypt('Temp',default_user_data))
 
         unencrypted_document = ''
-        unencrypted_document = unencrypted_document + "Preamble: " + input("Group name:") + '\n'
+        if not group_name:
+            unencrypted_document = unencrypted_document + "Preamble: " + input("Group name:") + '\n'
+        else:
+            unencrypted_document = unencrypted_document + "Preamble: " + group_name + '\n'
         counter = 1
         for i in users:
             unencrypted_document = unencrypted_document + i + f': {counter}\n'
@@ -281,7 +297,8 @@ class MasterDatabase():
 
         unencrypted_document = unencrypted_document[:-1]
  
-        with open("OurPasswordsTest.txt",'w') as NewFile:
+
+        with open(self.database_location,'w') as NewFile:
             NewFile.write(('').join(self.encrypt('Temp',unencrypted_document)))
         pass
 
@@ -318,7 +335,7 @@ class MasterDatabase():
         for i in self.file_sections[1:]:
             unencrypted_string = unencrypted_string + '\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n'
             unencrypted_string = unencrypted_string + i
-        with open('OurPasswords.txt','w') as UpdatedFile:
+        with open(self.database_location,'w') as UpdatedFile:
             UpdatedFile.write(('').join(self.encrypt('Master',unencrypted_string)))
 
 
