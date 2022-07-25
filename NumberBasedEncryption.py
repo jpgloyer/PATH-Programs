@@ -12,6 +12,7 @@ def get_chars_from_unencrypted_file(filename: str):
                 characters.append(char)
             elif not char:
                 end_of_file = True
+    print(characters)
     return characters
 
 def get_chars_from_encrypted_file(filename: str):
@@ -157,7 +158,7 @@ def encrypt(information: list[list[int]], password_values: list[int], iterations
             #     for k in range(len(information)):
             #         information[k] = right_rotate(information[k],1)
             # else:
-            encryption_single_iteration(information,j)
+            information = encryption_single_iteration(information,j)
     return information
 
 
@@ -173,7 +174,7 @@ def decrypt(information: list[list[int]], password_values: list[int], iterations
             #     for k in range(len(information)):
             #         information[k] = left_rotate(information[k],1)
             # else:
-            decryption_single_iteration(information,j)
+            information = decryption_single_iteration(information,j)
 
     return information
 
@@ -194,12 +195,19 @@ def test_encryption():
         #print(test)
         encrypted_info = encrypt(test,password_vals, iterations)
         #print(encrypted_info)
-        if decrypt(encrypted_info,password_vals,iterations) != test:
+        
+        decrypted_info = decrypt(encrypted_info,password_vals,iterations)
+        if decrypted_info != test:
             print('ERROR')
+        else:
+            print(test)
+            print(decrypted_info)
+            
 
 
 
 characters = get_chars_from_unencrypted_file('testing.txt')
+print(characters)
 characters = get_ascii_for_char_list(characters)
 password_vals, iterations = get_values_from_password('Password')
 encrypted_info = encrypt(characters,password_vals,iterations)
@@ -208,7 +216,10 @@ with open('Encryptedtesting.txt','w') as Output:
         for j in i:
             Output.write(str(j))
 
-encrypted_info = get_chars_from_unencrypted_file('Encryptedtesting.txt')
+#encrypted_info = get_chars_from_unencrypted_file('Encryptedtesting.txt')
+#print(encrypted_info)
 decrypted_info = decrypt(encrypted_info,password_vals,iterations)
 for i in decrypted_info:
     print(chr(100*i[0] + 10*i[1] + i[2]),end='')
+
+#test_encryption()
