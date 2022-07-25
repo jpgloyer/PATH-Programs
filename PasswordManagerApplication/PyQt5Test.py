@@ -152,8 +152,10 @@ class App(QtWidgets.QWidget):
         self.list_widget.setGeometry(250,100,200,200)
         for i in self.Database.personal_info_list[1:]:
             self.list_widget.addItem(QListWidgetItem(f'{i[0]}'))
+        
+        #print(self.Database.users)
 
-        if self.Database.users[self.Database.username] == '2':
+        if self.Database.users[self.Database.username] == '2' or len(self.Database.users) == 1:
             self.admin_button = QPushButton('Admin options',self)
             self.admin_button.clicked.connect(self.admin_options)
             layout.addWidget(self.admin_button, 3, 2)

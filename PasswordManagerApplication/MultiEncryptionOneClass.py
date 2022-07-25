@@ -239,20 +239,20 @@ class MasterDatabase():
         
         return new_password
 
-    def initialize_database(self, users: list = [], group_name: str = ''):
+    def initialize_database(self, users: list = []):
 
         default_user_data = "Website: Username: Password: "
 
-        if not users:
-            #Get number of users
-            try:
-                number_of_users = int(input("How many users?"))
-            except:
-                print("Enter a valid number")
+        # if not users:
+        #     #Get number of users
+        #     try:
+        #         number_of_users = int(input("How many users?"))
+        #     except:
+        #         print("Enter a valid number")
 
-            #Collect initial usernames
-            for i in range(number_of_users):
-                users.append(input(f"Username({i}):"))
+        #     #Collect initial usernames
+        #     for i in range(number_of_users):
+        #         users.append(input(f"Username({i}):"))
 
         #encrypted_default_user_data will be inserted in every user's section
         self.temp_password_vals, self.temp_key = self.get_vals_from_password('Password')
@@ -278,7 +278,7 @@ class MasterDatabase():
     def split_file_information(self):
         self.file_sections = self.decrypted_master_message.split('\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n')
         self.users = {}
-        for line in self.file_sections[0].split('\n'):
+        for line in self.file_sections[0].split('\n')[1:]:
             self.users[line.split(': ')[0]] = line.split(': ')[1]
         return self.file_sections,self.users
 
