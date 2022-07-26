@@ -38,18 +38,6 @@ class initialize_database_window(QtWidgets.QDialog):
         layout.addWidget(self.cancel_button,100,0)
 
 
-
-        # self.group_name = QLineEdit(self)
-        # layout.addWidget(QLabel("Group name/User 1: "),0,0)
-        # layout.addWidget(self.group_name,0,1)
-
-        # for i in range(len(self.labels)):
-        #     layout.addWidget(self.labels[i],i+1,0)
-        #     layout.addWidget(self.data_entry[i],i+1,1)
-        #     if self.labels[i] == self.labels[-1]:
-        #         layout.addWidget(self.enter_button,100,1)
-        #         layout.addWidget(self.cancel_button,100,0)
-        
     def enter(self):
         self.accept()
 

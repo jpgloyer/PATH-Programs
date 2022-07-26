@@ -216,26 +216,27 @@ class MasterDatabase():
         return decrypted_message
 
 
-    def randomize_password(self):
+    def randomize_password(self,length: int = 0):
         new_password = ''
-        length = 0
+        #length = 0
         number_index = -1
 
-        while True:
-            try:
-                length = int(input('Enter preferred length:'))
-                break
-            except:
-                print('Enter a valid number')
-        if input("Is a number required?('YES'):") == 'YES':
-            number_index = random.randint(0,length)
+        if not length:
+            while True:
+                try:
+                    length = int(input('Enter preferred length:'))
+                    break
+                except:
+                    print('Enter a valid number')
+        #if input("Is a number required?('YES'):") == 'YES':
+        #    number_index = random.randint(0,length)
 
         for i in range(length):
             if i != number_index:
                 character = random.choice(self.Reference_Character_List)
                 new_password = new_password + character
-            elif i == number_index:
-                character = random.choice(self.Reference_Character_List[0:9])
+            #elif i == number_index:
+            #    character = random.choice(self.Reference_Character_List[0:9])
         
         return new_password
 

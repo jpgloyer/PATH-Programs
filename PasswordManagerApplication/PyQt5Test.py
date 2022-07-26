@@ -7,6 +7,7 @@ from Login import Login
 from admin import admin
 from initialize_database_window import initialize_database_window
 import csv
+from collect_2d_information import collect_2d_information
 
 
 
@@ -23,7 +24,7 @@ class App(QtWidgets.QWidget):
         
 
         self.login_screen()
-        #Add specific inputs that will trigger database_initialization <-- maybe?
+
 
         self.Database.make_personal_info_list()
         self.Database.make_group_info_list()
@@ -49,12 +50,6 @@ class App(QtWidgets.QWidget):
             
             if self.Database.decrypted_master_message.find('Preamble:') != -1:
                 correct_master = True
-
-#---------------------------------------------  Add system here to check for "Group Name: Individual" in preamble and automatically log in to the only user saved...
-#---------------------------------------------  using the master password as the personal password
-
-#---------------------------------------------  Add system to use User 1 as a group password storage, being encrypted with the master password
-#---------------------------------------------  Move admin to User 2 slot and allow Admin sole control over altering group passwords
 
 
             #Username Validation
@@ -114,7 +109,7 @@ class App(QtWidgets.QWidget):
 
 
     def initUI(self):
-        self.setWindowTitle(self.title)
+        self.setWindowTitle(self.title + ' - ' + self.Database.username)
         self.setGeometry(self.left,self.top,self.width,self.height)
         layout = QtWidgets.QGridLayout(self)
 
@@ -172,6 +167,7 @@ class App(QtWidgets.QWidget):
 
         self.show()
 
+
     def reveal_password(self):
         if self.list_widget.selectedItems():
             for i in self.Database.personal_info_list:
@@ -182,52 +178,64 @@ class App(QtWidgets.QWidget):
         pass
 
     def add_entry(self, website: str = '', username: str = '', password: str = ''):
-        #---------------------------------------------------------Add randomize password option
-        
+        is_duplicate = False
         if not (website and username and password):
-            website_used = True
-            w_done = True
-            u_done = True
-            p_done = True
-            website = ''
-            username = ''
-            password = ''
-            while website_used == True:
-                while website == '' and w_done:
-                    website, w_done = QInputDialog.getText(self,'Website:','Which Website is this Entry For?')
-                    website_in_list = False
-                    for i in self.Database.personal_info_list:
-                        if i[0] == website:
-                            website_in_list = True
-                            alert = QMessageBox()
-                            alert.setText(f'Entry for {website} already present in personal database.\nUse "username@website" to store multiple accounts\' information.')
-                            alert.exec()
-                            website = ''
-                    if website_in_list == False:
-                        website_used = False
-            if w_done:
-                while username == '' and u_done:
-                    username, u_done = QInputDialog.getText(self,'Username:',f'Enter your Username for {website}:')
-                if u_done:
-                    while password == '' and p_done:
-                        password, p_done = QInputDialog.getText(self, 'Password:',f'Enter Password for {website}:')
-                    if p_done:
-                        self.Database.personal_info_list.append([website,username,password])
-                        self.list_widget.addItem(QListWidgetItem(website))
+            layout_list = ["Website: ","Username: ","Password: "]
+            window = collect_2d_information(layout_list)
+
+            while not (window.data_entry[0].text() and window.data_entry[1].text() and window.data_entry[2].text()):
+                is_duplicate = False
+                window.exec()
+                for i in self.Database.personal_info_list:
+                    if i[0] == window.data_entry[0].text():
+                        is_duplicate = True
+                        
+                if window.result() == window.Rejected:
+                    break
+                elif is_duplicate:
+                    message = QMessageBox()
+                    message.setText(f'Entry for {window.data_entry[0].text()} already present in personal database.\nUse "username@website" to store multiple accounts\' information.')
+                    message.exec()
+                
+                elif not (window.data_entry[0].text() and window.data_entry[1].text() and window.data_entry[2].text()):
+                    message = QMessageBox()
+                    message.setText("Complete All Fields or Cancel to Continue")
+                    message.exec()
+
+            if window.result() == window.Accepted:
+                website = window.data_entry[0].text()
+                username = window.data_entry[1].text()
+                password = window.data_entry[2].text()
+                if password == 'random' or password == 'Random':
+                    password = self.Database.randomize_password(QInputDialog.getInt(self,"Random Password Length:", "Random Password Length:", 10, 10, 30)[0])
+                    new_password = QMessageBox()
+                    new_password.setWindowTitle("New Password:")
+                    new_password.setText(password)
+                    new_password.exec()
+                self.Database.personal_info_list.append([website,username,password])
+                self.list_widget.addItem(QListWidgetItem(website))
         else:
             self.Database.personal_info_list.append([website,username,password])
             self.list_widget.addItem(QListWidgetItem(website))
+            
         pass
         
 
     def change_entry(self):
-        #---------------------------------------------------------Add randomize password option
         entry_to_change = self.list_widget.selectedItems()[0].text()
         for i in range(len(self.Database.personal_info_list)):
             if entry_to_change == self.Database.personal_info_list[i][0]:
-                new_password, np_done = QInputDialog.getText(self,'New Password',f'Enter {self.Database.personal_info_list[i][1]}\'s new password for {self.Database.personal_info_list[i][0]}:')
+                new_password, np_done = QInputDialog.getText(self,'New Password',f'Enter {self.Database.personal_info_list[i][1]}\'s new password for {self.Database.personal_info_list[i][0]}:\nEnter "Random" to randomize password:')
                 if np_done and new_password:
-                    self.Database.personal_info_list[i][2] = new_password
+                    if new_password.lower() != "random":
+                        self.Database.personal_info_list[i][2] = new_password
+                    else:
+                        password_length = QInputDialog.getInt(self, "Password Length:", "Password Length:", 10, 10, 30)[0]
+                        self.Database.personal_info_list[i][2] = self.Database.randomize_password(password_length)
+                        new_password = QMessageBox()
+                        new_password.setWindowTitle("New Password:")
+                        new_password.setText(self.Database.personal_info_list[i][2])
+                        new_password.exec()
         self
 
     def remove_entry(self):
@@ -255,6 +263,7 @@ class App(QtWidgets.QWidget):
         pass
 
     def import_passwords(self):
+        #Check for duplicates
         File = QFileDialog()
         File.setFileMode(QFileDialog.ExistingFile)
         File.setNameFilter("*.csv")
@@ -303,6 +312,7 @@ if __name__=='__main__':
 
 
     if ex.format == True:
+        
         initialize = initialize_database_window()
         initialize.exec()
         new_db_vals = initialize.return_values()
