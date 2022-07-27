@@ -16,7 +16,7 @@ class MasterDatabase():
                 pass
         except:
             self.database_location = 'Database.txt'
-            self.initialize_database(['User'],'FixMe')
+            self.initialize_database(['User'])
             
         self.message_list = self.message_list_generator()
 
@@ -241,21 +241,11 @@ class MasterDatabase():
         return new_password
 
     def initialize_database(self, users: list = []):
+        if not users:
+            pass
 
         default_user_data = "Website: Username: Password: "
 
-        # if not users:
-        #     #Get number of users
-        #     try:
-        #         number_of_users = int(input("How many users?"))
-        #     except:
-        #         print("Enter a valid number")
-
-        #     #Collect initial usernames
-        #     for i in range(number_of_users):
-        #         users.append(input(f"Username({i}):"))
-
-        #encrypted_default_user_data will be inserted in every user's section
         self.temp_password_vals, self.temp_key = self.get_vals_from_password('Password')
         encrypted_default_user_data = ('').join(self.encrypt('Temp',default_user_data))
 

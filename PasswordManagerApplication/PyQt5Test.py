@@ -3,11 +3,11 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QInputDialog, QMessageBox, QListWidget, QListWidgetItem
 from MultiEncryptionOneClass import MasterDatabase
 import pyperclip
-from Login import Login
 from admin import admin
-from initialize_database_window import initialize_database_window
 import csv
-from collect_2d_information import collect_2d_information
+from collect_information import collect_information
+
+
 
 
 
@@ -32,16 +32,22 @@ class App(QtWidgets.QWidget):
     
     def login_screen(self):
         correct_credentials = False
-        screen = Login()
+        #------------------------Create screen with flag argument to allow file selection------------------------------
+        #--------------------Assign file location with self.Database.database_location and write file location to self.Database.database_location_file
+        screen = collect_information(["*Master Password:","Username:","*Password:"])
         screen.attempts_remaining = 3
         
         while not correct_credentials and screen.attempts_remaining > 0:
             
             screen.exec()
+            if screen.result() == screen.Rejected:
+                exit()
+
+            credentials = screen.return_values()
+            m_pass = credentials[0]
+            uname = credentials[1]
+            ppass = credentials[2]
             
-            m_pass = screen.get_mpass()
-            uname = screen.get_uname()
-            ppass = screen.get_ppass()
 
             #Master Password Validation
             correct_master = False
@@ -86,7 +92,6 @@ class App(QtWidgets.QWidget):
             #Results
             if correct_master and valid_user and correct_personal:
                 correct_credentials = True
-                screen.accept()
             elif not correct_master and screen.attempts_remaining >= 0:
                 screen.attempts_remaining -= 1
                 message = QMessageBox()
@@ -148,7 +153,7 @@ class App(QtWidgets.QWidget):
         for i in self.Database.personal_info_list[1:]:
             self.list_widget.addItem(QListWidgetItem(f'{i[0]}'))
         
-        #print(self.Database.users)
+
 
         if self.Database.users[self.Database.username] == '2' or len(self.Database.users) == 1:
             self.admin_button = QPushButton('Admin options',self)
@@ -181,7 +186,7 @@ class App(QtWidgets.QWidget):
         is_duplicate = False
         if not (website and username and password):
             layout_list = ["Website: ","Username: ","Password: "]
-            window = collect_2d_information(layout_list)
+            window = collect_information(layout_list)
 
             while not (window.data_entry[0].text() and window.data_entry[1].text() and window.data_entry[2].text()):
                 is_duplicate = False
@@ -263,10 +268,12 @@ class App(QtWidgets.QWidget):
         pass
 
     def import_passwords(self):
-        #Check for duplicates
         File = QFileDialog()
         File.setFileMode(QFileDialog.ExistingFile)
         File.setNameFilter("*.csv")
+        message = 'Entries for:\n\n'
+        show_message = False
+        redundant_entry = False
         
         if File.exec_():
             with open(File.selectedFiles()[0]) as NewPasswords:
@@ -276,7 +283,21 @@ class App(QtWidgets.QWidget):
                     entries.append(row)
                 del passwords
                 for i in entries[1:]:
-                    self.add_entry(i[0],i[1],i[2])
+                    redundant_entry = False
+                    for j in self.Database.personal_info_list:
+                        if i[0] == j[0]:
+                            redundant_entry = True
+                            show_message = True
+                    if not redundant_entry:
+                        self.add_entry(i[0],i[1],i[2])
+                    else:
+                        message = message + f'{i[0]}\n'
+
+        message = message + '\nalready present\t\t\t\t'
+        if show_message == True:
+            message_box = QMessageBox()
+            message_box.setText(message)
+            message_box.exec()
         
 
 
@@ -288,11 +309,11 @@ class App(QtWidgets.QWidget):
 
 
     def admin_options(self):
-        admin_options = admin(self)
-        admin_options.exec()
-        if admin_options.new_pass:
-            self.Database.master_password = admin_options.new_pass
-        if admin_options.format == True:
+        self.admin_options_window = admin(self)
+        self.admin_options_window.exec()
+        if self.admin_options_window.new_pass:
+            self.Database.master_password = self.admin_options_window.new_pass
+        if self.admin_options_window.format == True:
             self.format = True
             self.close()
             pass
@@ -301,22 +322,24 @@ class App(QtWidgets.QWidget):
         
 
 if __name__=='__main__':
-
-
     Database = MasterDatabase('Database_location.txt')
-    #Database.initialize_database()
     app=QApplication(sys.argv)    
     ex=App(Database)
 
     app.exec_()
 
-
     if ex.format == True:
-        
-        initialize = initialize_database_window()
+
+        if ex.admin_options_window.how_many_users > 1:
+            information_to_collect = [f"User{i}" if i != 0 else "Group:" for i in range(ex.admin_options_window.how_many_users+1)]
+        else:
+            information_to_collect = ["User:"]
+        initialize = collect_information(information_to_collect)
         initialize.exec()
-        new_db_vals = initialize.return_values()
-        Database.initialize_database(new_db_vals)
+
+        if initialize.use_this_data:
+            new_db_vals = initialize.return_values()
+            Database.initialize_database(new_db_vals)
     else:
         Database.save_changes()
         Database.reencrypt()
