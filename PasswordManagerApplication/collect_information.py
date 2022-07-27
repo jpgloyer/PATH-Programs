@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QFileDialog
 import sys
 
 
@@ -14,7 +15,6 @@ class collect_information(QtWidgets.QDialog):
     '''
 
 
-
     def __init__(self, layout_terms: list = [], flags: list = [], parent=None):
 
 
@@ -24,13 +24,27 @@ class collect_information(QtWidgets.QDialog):
         super(collect_information, self).__init__(parent)
         layout = QtWidgets.QGridLayout(self)
         self.data_entry = [QtWidgets.QLineEdit(self) for i in layout_terms]
+        self.file_choice = ''
+
+
+        #Buttons
         self.buttons = [QtWidgets.QPushButton("Cancel", self), QtWidgets.QPushButton("Enter", self)]
         self.buttons[0].clicked.connect(self.cancel)
         self.buttons[1].clicked.connect(self.enter)
         self.buttons[0].setAutoDefault(False)
         self.buttons[1].setAutoDefault(True)
+        
+        for i in flags:
+            if i == 'file':
+                self.buttons.append(QtWidgets.QPushButton("Choose Database:", self))
+                self.buttons[-1].clicked.connect(self.choose_database)
+                self.buttons[-1].setAutoDefault(False)
+        
+        
         self.use_this_data = False
         self.attempts_remaining = 3
+
+
         for i in range(len(layout_terms)):
             if layout_terms[i][0] == '*':
                 self.data_entry[i].setEchoMode(QtWidgets.QLineEdit.Password)
@@ -38,8 +52,10 @@ class collect_information(QtWidgets.QDialog):
         for i in range(len(layout_terms)):
             layout.addWidget(QtWidgets.QLabel(layout_terms[i].strip("*")),i,0)
             layout.addWidget(self.data_entry[i],i,1)
-        for i in self.buttons:
+        for i in self.buttons[2:]:
             layout.addWidget(i)
+        layout.addWidget(self.buttons[0],100, 0)
+        layout.addWidget(self.buttons[1],100, 1)
 
     def enter(self):
         self.use_this_data = True
@@ -48,6 +64,14 @@ class collect_information(QtWidgets.QDialog):
     def cancel(self):
         self.reject()
         #self.close()
+
+    def choose_database(self):
+        file_select = QFileDialog()
+        file_select.setFileMode(QFileDialog.ExistingFile)
+        file_select.setNameFilter("*.txt")
+        if file_select.exec():
+            self.file_choice = file_select.selectedFiles()[0]
+
 
     def return_values(self):
         return [i.text() for i in self.data_entry]

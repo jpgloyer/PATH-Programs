@@ -12,15 +12,16 @@ from collect_information import collect_information
 
 
 class App(QtWidgets.QWidget):
-    def __init__(self,Database):
+    def __init__(self):
         super().__init__()
         self.title='Password Manager'
         self.left=600
         self.top=400
         self.width=400
         self.height=400
-        self.Database = Database
+        #self.Database = MasterDatabase("LOCATIONHERE")
         self.format = False
+        self.database_location = ''
         
 
         self.login_screen()
@@ -34,14 +35,43 @@ class App(QtWidgets.QWidget):
         correct_credentials = False
         #------------------------Create screen with flag argument to allow file selection------------------------------
         #--------------------Assign file location with self.Database.database_location and write file location to self.Database.database_location_file
-        screen = collect_information(["*Master Password:","Username:","*Password:"])
-        screen.attempts_remaining = 3
+        screen = collect_information(["*Master Password:","Username:","*Password:"],['file'])
+        
+        
         
         while not correct_credentials and screen.attempts_remaining > 0:
             
+            screen.file_choice = ''
+            
             screen.exec()
+
             if screen.result() == screen.Rejected:
                 exit()
+
+
+
+            #First, check if user explicitly chose file location during login
+            if screen.file_choice:
+                self.database_location = screen.file_choice
+                self.Database = MasterDatabase(self.database_location)
+                
+                
+            else:
+                #Second, try to open file recorded by local file DataBase_location.txt
+                try:
+                    with open("DataBase_location.txt") as File:
+                        for line in File:
+                            self.database_location = line
+                    self.Database = MasterDatabase(self.database_location)
+                #Lastly, create new database and database_location files locally
+                except:
+                    with open("DataBase_location.txt",'w') as File:
+                        File.write("Passwords.txt")
+                        self.database_location = "Passwords.txt"
+                    self.Database = MasterDatabase(self.database_location, ['Initialize'])
+
+
+
 
             credentials = screen.return_values()
             m_pass = credentials[0]
@@ -53,7 +83,7 @@ class App(QtWidgets.QWidget):
             correct_master = False
             self.Database.input_master_password(m_pass)
             self.Database.decrypt('Master',self.Database.message_list_generator())
-            
+            print(self.Database.database_location)
             if self.Database.decrypted_master_message.find('Preamble:') != -1:
                 correct_master = True
 
@@ -91,6 +121,8 @@ class App(QtWidgets.QWidget):
             
             #Results
             if correct_master and valid_user and correct_personal:
+                with open("DataBase_location.txt",'w') as File:
+                    File.write(self.database_location)
                 correct_credentials = True
             elif not correct_master and screen.attempts_remaining >= 0:
                 screen.attempts_remaining -= 1
@@ -135,8 +167,9 @@ class App(QtWidgets.QWidget):
         self.remove.clicked.connect(self.remove_entry)
 
         #Change personal password
-        self.change_personal_password_button=QPushButton('Change Personal Password',self)
-        self.change_personal_password_button.clicked.connect(self.change_personal_password)
+        if len(self.Database.users) != 1:
+            self.change_personal_password_button=QPushButton('Change Personal Password',self)
+            self.change_personal_password_button.clicked.connect(self.change_personal_password)
 
         #Import passwords
         self.import_passwords_button = QPushButton("Import Passwords",self)
@@ -164,7 +197,8 @@ class App(QtWidgets.QWidget):
         layout.addWidget(self.add,1,0)
         layout.addWidget(self.change_entry_password,2,0)
         layout.addWidget(self.remove,3,0)
-        layout.addWidget(self.change_personal_password_button,4,0)
+        if len(self.Database.users) != 1:
+            layout.addWidget(self.change_personal_password_button,4,0)
         layout.addWidget(self.list_widget,0,1,4,1)
         layout.addWidget(self.credits, 4, 2)
         layout.addWidget(self.import_passwords_button, 5,0)
@@ -227,21 +261,29 @@ class App(QtWidgets.QWidget):
         
 
     def change_entry(self):
-        entry_to_change = self.list_widget.selectedItems()[0].text()
-        for i in range(len(self.Database.personal_info_list)):
-            if entry_to_change == self.Database.personal_info_list[i][0]:
-                new_password, np_done = QInputDialog.getText(self,'New Password',f'Enter {self.Database.personal_info_list[i][1]}\'s new password for {self.Database.personal_info_list[i][0]}:\nEnter "Random" to randomize password:')
-                if np_done and new_password:
-                    if new_password.lower() != "random":
-                        self.Database.personal_info_list[i][2] = new_password
-                    else:
-                        password_length = QInputDialog.getInt(self, "Password Length:", "Password Length:", 10, 10, 30)[0]
-                        self.Database.personal_info_list[i][2] = self.Database.randomize_password(password_length)
-                        new_password = QMessageBox()
-                        new_password.setWindowTitle("New Password:")
-                        new_password.setText(self.Database.personal_info_list[i][2])
-                        new_password.exec()
-        self
+        error: bool = False
+        try:
+            entry_to_change = self.list_widget.selectedItems()[0].text()
+        except IndexError:
+            message = QMessageBox()
+            message.setText("Error: Please select an entry to remove:")
+            message.exec()
+            error = True
+
+        if not error:
+            for i in range(len(self.Database.personal_info_list)):
+                if entry_to_change == self.Database.personal_info_list[i][0]:
+                    new_password, np_done = QInputDialog.getText(self,'New Password',f'Enter {self.Database.personal_info_list[i][1]}\'s new password for {self.Database.personal_info_list[i][0]}:\nEnter "Random" to randomize password:')
+                    if np_done and new_password:
+                        if new_password.lower() != "random":
+                            self.Database.personal_info_list[i][2] = new_password
+                        else:
+                            password_length = QInputDialog.getInt(self, "Password Length:", "Password Length:", 10, 10, 30)[0]
+                            self.Database.personal_info_list[i][2] = self.Database.randomize_password(password_length)
+                            new_password = QMessageBox()
+                            new_password.setWindowTitle("New Password:")
+                            new_password.setText(self.Database.personal_info_list[i][2])
+                            new_password.exec()
 
     def remove_entry(self):
         try:
@@ -318,15 +360,20 @@ class App(QtWidgets.QWidget):
             self.close()
             pass
         pass
-
+    
+    def get_database(self):
+        return self.Database
         
 
 if __name__=='__main__':
-    Database = MasterDatabase('Database_location.txt')
+    #Database = MasterDatabase('Database_location.txt')
     app=QApplication(sys.argv)    
-    ex=App(Database)
+    #ex=App(Database)
+    ex = App()
 
     app.exec_()
+
+    Database = ex.get_database()
 
     if ex.format == True:
 

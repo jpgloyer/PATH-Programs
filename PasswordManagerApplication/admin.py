@@ -28,7 +28,13 @@ class admin(QtWidgets.QDialog):
 
     def change_master_password(self):
         '''Takes input to to self.new_pass. self.new_pass can be accessed after self.exec() to set a new password.'''
+
+
+        #-------------------------------------------Modify to add secondary confirm password line and QLineEdit.setEchoMode(QtWidgets.QLineEdit.Password)
+
+
         self.new_pass = QInputDialog.getText(self,'New Master Password', 'Enter new organization master password: ')[0]
+
 
     def format_database(self):
         '''Confirms user's choice to format the database, then sets self.format to True.
@@ -39,6 +45,7 @@ class admin(QtWidgets.QDialog):
         if confirmation == 'CONFIRM' and c_done:
             self.format = True
             self.close()
+
 
     def change_database_location(self):
         File = QFileDialog()

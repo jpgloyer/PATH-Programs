@@ -1,26 +1,20 @@
 import random
 
-#Add a single user system
 
 class MasterDatabase():
-    def __init__(self, database_location_file):
+    def __init__(self, database_location, flags: list = []):
         '''
         Creates a custom Database object
         database_location_file -> local file containing path to Database longterm storage file ("DataBase_location.txt" by default)
         '''
-        self.database_location_file = database_location_file
+        self.database_location = database_location
         self.Reference_Character_List = self.get_chars()
         self.max_key = int(len(self.Reference_Character_List)/2-1)
         
-        with open(database_location_file) as File:
-            for line in File:
-                self.database_location = line
-        try:
-            with open(self.database_location):
-                pass
-        except:
-            self.database_location = 'Database.txt'
-            self.initialize_database(['User'])
+
+        for i in flags:
+            if i == 'Initialize':
+                self.initialize_database(['User'])
             
         self.message_list = self.message_list_generator()
 
@@ -50,10 +44,8 @@ class MasterDatabase():
         Simply generates a list of potential characters usable by the encryption and decryption functions
         Changing the list between encryption and decryption will prevent decryption from working properly, but
             if encryption and decryption are run using the same character list, it will work regardless of the list contents
+        Output list is doubled for the sake of simplicity in the char_input_output() function
         '''
-        #To be used once at the beginning of every run of the program
-        #Simply generates a list of standard characters (numbers, lower and capital case letters)
-        #Returns the completed list, doubled
         #Capital Letters
         Character_List1 = [chr(i) for i in range(65,91)]
         #Lower case letters
@@ -130,8 +122,7 @@ class MasterDatabase():
         character_list: list of characters - this list should contain every potential character twice (ie. [1,2,3,1,2,3])
             list is used to translate input characters to output characters
         '''
-        #Takes in one input character that is searched for in the character list
-        #Returns the position of the character in the list, shifted by the amount inputted as encryption_value
+
         index = 0
         i = 0
         length = len(self.Reference_Character_List) - 1
@@ -343,6 +334,7 @@ class MasterDatabase():
         for i in self.file_sections[1:]:
             unencrypted_string = unencrypted_string + '\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n'
             unencrypted_string = unencrypted_string + i
+        print("reencrypting to:"+self.database_location)
         with open(self.database_location,'w') as UpdatedFile:
             UpdatedFile.write(('').join(self.encrypt('Master',unencrypted_string)))
 
