@@ -41,12 +41,17 @@ class App(QtWidgets.QWidget):
         
         while not correct_credentials and screen.attempts_remaining > 0:
             
-            screen.file_choice = ''
-            
             screen.exec()
 
             if screen.result() == screen.Rejected:
                 exit()
+
+
+
+            credentials = screen.return_values()
+            m_pass = credentials[0]
+            uname = credentials[1]
+            ppass = credentials[2]
 
 
 
@@ -69,21 +74,17 @@ class App(QtWidgets.QWidget):
                         File.write("Passwords.txt")
                         self.database_location = "Passwords.txt"
                     self.Database = MasterDatabase(self.database_location, ['Initialize'])
+                    message = QMessageBox()
+                    message.setText("Database not selected and/or database_location.txt not found\nDataBase_location.txt created in current directory\nPasswords.txt created as database file in current directory\nLogging in using password: 'Password'\nSelect 'Admin Options' -> 'Format Database' to set up database location for future use")
+                    message.exec()
+                    m_pass = "Password"
 
-
-
-
-            credentials = screen.return_values()
-            m_pass = credentials[0]
-            uname = credentials[1]
-            ppass = credentials[2]
-            
 
             #Master Password Validation
             correct_master = False
             self.Database.input_master_password(m_pass)
             self.Database.decrypt('Master',self.Database.message_list_generator())
-            print(self.Database.database_location)
+            
             if self.Database.decrypted_master_message.find('Preamble:') != -1:
                 correct_master = True
 
@@ -167,7 +168,8 @@ class App(QtWidgets.QWidget):
         self.remove.clicked.connect(self.remove_entry)
 
         #Change personal password
-        if len(self.Database.users) != 1:
+
+        if len(self.Database.users) > 1 and self.Database.users[self.Database.username] != '1':
             self.change_personal_password_button=QPushButton('Change Personal Password',self)
             self.change_personal_password_button.clicked.connect(self.change_personal_password)
 
@@ -197,7 +199,7 @@ class App(QtWidgets.QWidget):
         layout.addWidget(self.add,1,0)
         layout.addWidget(self.change_entry_password,2,0)
         layout.addWidget(self.remove,3,0)
-        if len(self.Database.users) != 1:
+        if len(self.Database.users) > 1 and self.Database.users[self.Database.username] != '1':
             layout.addWidget(self.change_personal_password_button,4,0)
         layout.addWidget(self.list_widget,0,1,4,1)
         layout.addWidget(self.credits, 4, 2)

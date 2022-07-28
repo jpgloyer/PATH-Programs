@@ -11,10 +11,13 @@ class MasterDatabase():
         self.Reference_Character_List = self.get_chars()
         self.max_key = int(len(self.Reference_Character_List)/2-1)
         
+        
 
         for i in flags:
             if i == 'Initialize':
                 self.initialize_database(['User'])
+                
+
             
         self.message_list = self.message_list_generator()
 
@@ -334,7 +337,7 @@ class MasterDatabase():
         for i in self.file_sections[1:]:
             unencrypted_string = unencrypted_string + '\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n'
             unencrypted_string = unencrypted_string + i
-        print("reencrypting to:"+self.database_location)
+
         with open(self.database_location,'w') as UpdatedFile:
             UpdatedFile.write(('').join(self.encrypt('Master',unencrypted_string)))
 

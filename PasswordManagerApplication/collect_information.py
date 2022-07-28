@@ -22,9 +22,10 @@ class collect_information(QtWidgets.QDialog):
 
 
         super(collect_information, self).__init__(parent)
-        layout = QtWidgets.QGridLayout(self)
+        self.win_layout = QtWidgets.QGridLayout(self)
         self.data_entry = [QtWidgets.QLineEdit(self) for i in layout_terms]
         self.file_choice = ''
+        self.file_label = ''
 
 
         #Buttons
@@ -50,12 +51,18 @@ class collect_information(QtWidgets.QDialog):
                 self.data_entry[i].setEchoMode(QtWidgets.QLineEdit.Password)
 
         for i in range(len(layout_terms)):
-            layout.addWidget(QtWidgets.QLabel(layout_terms[i].strip("*")),i,0)
-            layout.addWidget(self.data_entry[i],i,1)
+            self.win_layout.addWidget(QtWidgets.QLabel(layout_terms[i].strip("*")),i,0)
+            self.win_layout.addWidget(self.data_entry[i],i,1)
+        row_counter = len(layout_terms)
+        
         for i in self.buttons[2:]:
-            layout.addWidget(i)
-        layout.addWidget(self.buttons[0],100, 0)
-        layout.addWidget(self.buttons[1],100, 1)
+            self.win_layout.addWidget(i, row_counter,0)
+            row_counter += 1
+        
+
+
+        self.win_layout.addWidget(self.buttons[0],100, 0)
+        self.win_layout.addWidget(self.buttons[1],100, 1)
 
     def enter(self):
         self.use_this_data = True
@@ -69,8 +76,17 @@ class collect_information(QtWidgets.QDialog):
         file_select = QFileDialog()
         file_select.setFileMode(QFileDialog.ExistingFile)
         file_select.setNameFilter("*.txt")
+        
+
+        if self.file_label:
+            self.file_label.deleteLater()
+
         if file_select.exec():
             self.file_choice = file_select.selectedFiles()[0]
+            self.file_label = QtWidgets.QLabel(file_select.selectedFiles()[0])
+        
+        self.win_layout.addWidget(self.file_label,3,1)
+        
 
 
     def return_values(self):
