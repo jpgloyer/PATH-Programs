@@ -1,17 +1,16 @@
 import sys
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QInputDialog, QMessageBox, QListWidget, QListWidgetItem
+from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QInputDialog, QMessageBox, QListWidget, QListWidgetItem, QGridLayout, QWidget
 from MasterDatabase import MasterDatabase
 import pyperclip
 from admin import admin
-import csv
+from csv import reader
 from collect_information import collect_information
 
 
 
 
 
-class App(QtWidgets.QWidget):
+class App(QWidget):
     def __init__(self):
         super().__init__()
         self.title='Password Manager'
@@ -149,7 +148,7 @@ class App(QtWidgets.QWidget):
     def initUI(self):
         self.setWindowTitle(self.title + ' - ' + self.Database.username)
         self.setGeometry(self.left,self.top,self.width,self.height)
-        layout = QtWidgets.QGridLayout(self)
+        layout = QGridLayout(self)
 
         #Reveal button
         self.reveal=QPushButton('Reveal Password',self)
@@ -168,7 +167,6 @@ class App(QtWidgets.QWidget):
         self.remove.clicked.connect(self.remove_entry)
 
         #Change personal password
-
         if len(self.Database.users) > 1 and self.Database.users[self.Database.username] != '1':
             self.change_personal_password_button=QPushButton('Change Personal Password',self)
             self.change_personal_password_button.clicked.connect(self.change_personal_password)
@@ -180,8 +178,6 @@ class App(QtWidgets.QWidget):
         #Credits button
         self.credits = QPushButton('Credits',self)
         self.credits.clicked.connect(self.credits_message)
-        #self.credits.move(540,455)
-        #self.credits.resize(100,25)
 
         self.list_widget = QListWidget(self)
         self.list_widget.setGeometry(250,100,200,200)
@@ -321,7 +317,7 @@ class App(QtWidgets.QWidget):
         
         if File.exec_():
             with open(File.selectedFiles()[0]) as NewPasswords:
-                passwords = csv.reader(NewPasswords)
+                passwords = reader(NewPasswords)
                 entries = []
                 for row in passwords:
                     entries.append(row)

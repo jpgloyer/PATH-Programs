@@ -1,12 +1,10 @@
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QFileDialog
-import sys
+from PyQt5.QtWidgets import QFileDialog, QGridLayout, QLineEdit, QDialog, QPushButton, QLabel
 
 
 # Combine initialize_database_window.py with this class
 # Potentially Login.py as well
 
-class collect_information(QtWidgets.QDialog):
+class collect_information(QDialog):
 
     '''
     Pass a list of arguments you would like to collect information for
@@ -22,14 +20,14 @@ class collect_information(QtWidgets.QDialog):
 
 
         super(collect_information, self).__init__(parent)
-        self.win_layout = QtWidgets.QGridLayout(self)
-        self.data_entry = [QtWidgets.QLineEdit(self) for i in layout_terms]
+        self.win_layout = QGridLayout(self)
+        self.data_entry = [QLineEdit(self) for i in layout_terms]
         self.file_choice = ''
         self.file_label = ''
 
 
         #Buttons
-        self.buttons = [QtWidgets.QPushButton("Cancel", self), QtWidgets.QPushButton("Enter", self)]
+        self.buttons = [QPushButton("Cancel", self), QPushButton("Enter", self)]
         self.buttons[0].clicked.connect(self.cancel)
         self.buttons[1].clicked.connect(self.enter)
         self.buttons[0].setAutoDefault(False)
@@ -37,7 +35,7 @@ class collect_information(QtWidgets.QDialog):
         
         for i in flags:
             if i == 'file':
-                self.buttons.append(QtWidgets.QPushButton("Choose Database:", self))
+                self.buttons.append(QPushButton("Choose Database:", self))
                 self.buttons[-1].clicked.connect(self.choose_database)
                 self.buttons[-1].setAutoDefault(False)
         
@@ -48,10 +46,10 @@ class collect_information(QtWidgets.QDialog):
 
         for i in range(len(layout_terms)):
             if layout_terms[i][0] == '*':
-                self.data_entry[i].setEchoMode(QtWidgets.QLineEdit.Password)
+                self.data_entry[i].setEchoMode(QLineEdit.Password)
 
         for i in range(len(layout_terms)):
-            self.win_layout.addWidget(QtWidgets.QLabel(layout_terms[i].strip("*")),i,0)
+            self.win_layout.addWidget(QLabel(layout_terms[i].strip("*")),i,0)
             self.win_layout.addWidget(self.data_entry[i],i,1)
         row_counter = len(layout_terms)
         
@@ -83,7 +81,7 @@ class collect_information(QtWidgets.QDialog):
 
         if file_select.exec():
             self.file_choice = file_select.selectedFiles()[0]
-            self.file_label = QtWidgets.QLabel(file_select.selectedFiles()[0])
+            self.file_label = QLabel(file_select.selectedFiles()[0])
         
         self.win_layout.addWidget(self.file_label,3,1)
         
@@ -93,9 +91,9 @@ class collect_information(QtWidgets.QDialog):
         return [i.text() for i in self.data_entry]
         
 
-if __name__=='__main__':
-    Application = QtWidgets.QApplication(sys.argv)
-    App = QtWidgets.QWidget()
-    Collect = collect_information(["Test1", "Test2"])
-    Collect.exec()
-    print(Collect.return_values())
+# if __name__=='__main__':
+#     Application = QtWidgets.QApplication(sys.argv)
+#     App = QtWidgets.QWidget()
+#     Collect = collect_information(["Test1", "Test2"])
+#     Collect.exec()
+#     print(Collect.return_values())
