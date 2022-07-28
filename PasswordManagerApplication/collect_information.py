@@ -1,9 +1,6 @@
 from PyQt5.QtWidgets import QFileDialog, QGridLayout, QLineEdit, QDialog, QPushButton, QLabel
 
 
-# Combine initialize_database_window.py with this class
-# Potentially Login.py as well
-
 class collect_information(QDialog):
 
     '''
@@ -14,9 +11,6 @@ class collect_information(QDialog):
 
 
     def __init__(self, layout_terms: list = [], flags: list = [], parent=None):
-
-
-        #------------------If "file_select" flag is present, add button that opens a QFileDialog window and assigns the selection to self.new_file_location
 
 
         super(collect_information, self).__init__(parent)

@@ -32,8 +32,7 @@ class App(QWidget):
     
     def login_screen(self):
         correct_credentials = False
-        #------------------------Create screen with flag argument to allow file selection------------------------------
-        #--------------------Assign file location with self.Database.database_location and write file location to self.Database.database_location_file
+
         screen = collect_information(["*Master Password:","Username:","*Password:"],['file'])
         
         
