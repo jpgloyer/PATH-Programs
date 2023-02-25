@@ -76,6 +76,13 @@ def email_password(password):
         smtp_server.sendmail(sender_add,receiver_add,msg_to_be_sent)
         smtp_server.quit()
 
+def export_passwords(decrypted_password_list):
+    with open("Passwords.csv",'w') as Passwords:
+        for i in decrypted_password_list:
+            print(i[0]+i[1]+i[2])
+            Passwords.write(i[0]+','+i[1]+','+i[2]+'\n')
+
+
 def main():
     init()
     decrypted_password_list = [[]]
@@ -202,6 +209,9 @@ def main():
         elif operation_choice == '5':
             print('Copy for later use')
             randomize_password()
+
+        elif operation_choice == '6':
+            export_passwords(decrypted_password_list)
 
     rewrite_to_file(decrypted_password_list,Master_Password)
     
