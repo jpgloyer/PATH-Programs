@@ -1,6 +1,8 @@
 import random
 
 
+#--------------------------------------Add export_to_csv option-----------------------------------
+
 class MasterDatabase():
     def __init__(self, database_location, flags: list = []):
         '''
@@ -341,6 +343,10 @@ class MasterDatabase():
         with open(self.database_location,'w') as UpdatedFile:
             UpdatedFile.write(('').join(self.encrypt('Master',unencrypted_string)))
 
+    def export_passwords(self, file_path: str = ''):
+        with open(file_path, 'w') as Export:
+            for i in self.personal_info_list:
+                Export.write(i[0]+','+i[1]+','+i[2]+'\n')
 
 
 '''For testing purposes:'''

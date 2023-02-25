@@ -25,7 +25,7 @@ class App(QWidget):
 
         self.login_screen()
 
-
+        
         self.Database.make_personal_info_list()
         self.Database.make_group_info_list()
         self.initUI()
@@ -33,20 +33,25 @@ class App(QWidget):
     def login_screen(self):
         correct_credentials = False
 
-        screen = collect_information(["*Master Password:","Username:","*Password:"],['file'])
+        self.screen = collect_information(["*Master Password:","Username:","*Password:"],['file','format'])
         
         
         
-        while not correct_credentials and screen.attempts_remaining > 0:
+        while not correct_credentials and self.screen.attempts_remaining > 0:
             
-            screen.exec()
+            self.screen.exec()
 
-            if screen.result() == screen.Rejected:
+            if self.screen.result() == self.screen.Rejected:
                 exit()
 
+            if self.screen.new_database:
+                #self.Database = MasterDatabase('Passwords.txt')
+                self.accept()
+                
 
 
-            credentials = screen.return_values()
+
+            credentials = self.screen.return_values()
             m_pass = credentials[0]
             uname = credentials[1]
             ppass = credentials[2]
@@ -54,8 +59,8 @@ class App(QWidget):
 
 
             #First, check if user explicitly chose file location during login
-            if screen.file_choice:
-                self.database_location = screen.file_choice
+            if self.screen.file_choice:
+                self.database_location = self.screen.file_choice
                 self.Database = MasterDatabase(self.database_location)
                 
                 
@@ -123,24 +128,24 @@ class App(QWidget):
                 with open("DataBase_location.txt",'w') as File:
                     File.write(self.database_location)
                 correct_credentials = True
-            elif not correct_master and screen.attempts_remaining >= 0:
-                screen.attempts_remaining -= 1
+            elif not correct_master and self.screen.attempts_remaining >= 0:
+                self.screen.attempts_remaining -= 1
                 message = QMessageBox()
-                message.setText(f"INVALID MASTER PASSWORD\n{screen.attempts_remaining} attempts remaining")
+                message.setText(f"INVALID MASTER PASSWORD\n{self.screen.attempts_remaining} attempts remaining")
                 message.exec()
-            elif not valid_user and screen.attempts_remaining >= 0:
-                screen.attempts_remaining -= 1
+            elif not valid_user and self.screen.attempts_remaining >= 0:
+                self.screen.attempts_remaining -= 1
                 message = QMessageBox()
-                message.setText(f"INVALID USERNAME\n{screen.attempts_remaining} attempts remaining")
+                message.setText(f"INVALID USERNAME\n{self.screen.attempts_remaining} attempts remaining")
                 message.exec()
-            elif not correct_personal and screen.attempts_remaining >= 0:
-                screen.attempts_remaining -= 1
+            elif not correct_personal and self.screen.attempts_remaining >= 0:
+                self.screen.attempts_remaining -= 1
                 message = QMessageBox()
-                message.setText(f"INVALID PERSONAL PASSWORD\n{screen.attempts_remaining} attempts remaining")
+                message.setText(f"INVALID PERSONAL PASSWORD\n{self.screen.attempts_remaining} attempts remaining")
                 message.exec()
 
         
-        if screen.attempts_remaining <= 0:
+        if self.screen.attempts_remaining <= 0:
             exit()
 
 
@@ -178,6 +183,10 @@ class App(QWidget):
         self.credits = QPushButton('Credits',self)
         self.credits.clicked.connect(self.credits_message)
 
+        #Export button
+        self.export = QPushButton('Export',self)
+        self.export.clicked.connect(self.export_passwords)
+
         self.list_widget = QListWidget(self)
         self.list_widget.setGeometry(250,100,200,200)
         for i in self.Database.personal_info_list[1:]:
@@ -198,10 +207,14 @@ class App(QWidget):
             layout.addWidget(self.change_personal_password_button,4,0)
         layout.addWidget(self.list_widget,0,1,4,1)
         layout.addWidget(self.credits, 4, 2)
+        layout.addWidget(self.export, 5,2)
         layout.addWidget(self.import_passwords_button, 5,0)
         #---------------------------------------------------------------------------------------Add button to generate a temporary random password
 
         self.show()
+
+    def export_passwords(self):
+        self.Database.export_passwords('ExportedPasswords.txt')
 
 
     def reveal_password(self):
@@ -371,6 +384,9 @@ if __name__=='__main__':
     app.exec_()
 
     Database = ex.get_database()
+
+
+    #-------------------------------------FIX THIS CRAP-------------------------------------------
 
     if ex.format == True:
 

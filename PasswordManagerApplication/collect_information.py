@@ -18,6 +18,7 @@ class collect_information(QDialog):
         self.data_entry = [QLineEdit(self) for i in layout_terms]
         self.file_choice = ''
         self.file_label = ''
+        self.new_database = ''
 
 
         #Buttons
@@ -31,6 +32,10 @@ class collect_information(QDialog):
             if i == 'file':
                 self.buttons.append(QPushButton("Choose Database:", self))
                 self.buttons[-1].clicked.connect(self.choose_database)
+                self.buttons[-1].setAutoDefault(False)
+            if i == 'format':
+                self.buttons.append(QPushButton("Create New Database:",self))
+                self.buttons[-1].clicked.connect(self.create_new_database)
                 self.buttons[-1].setAutoDefault(False)
         
         
@@ -47,6 +52,7 @@ class collect_information(QDialog):
             self.win_layout.addWidget(self.data_entry[i],i,1)
         row_counter = len(layout_terms)
         
+
         for i in self.buttons[2:]:
             self.win_layout.addWidget(i, row_counter,0)
             row_counter += 1
@@ -76,8 +82,17 @@ class collect_information(QDialog):
         if file_select.exec():
             self.file_choice = file_select.selectedFiles()[0]
             self.file_label = QLabel(file_select.selectedFiles()[0])
-        
-        self.win_layout.addWidget(self.file_label,3,1)
+            self.win_layout.addWidget(self.file_label,3,1)
+
+    def create_new_database(self):
+        database_select = QFileDialog()
+        database_select.setFileMode(QFileDialog.ExistingFile)
+        database_select.setNameFilter("*.txt")
+
+        if database_select.exec():
+            self.new_database = database_select.selectedFiles()[0]
+            
+            self.accept()
         
 
 

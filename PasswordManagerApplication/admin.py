@@ -39,7 +39,7 @@ class admin(QtWidgets.QDialog):
     def format_database(self):
         '''Confirms user's choice to format the database, then sets self.format to True.
         self.format can be accessed after self.exec() to trigger database_initialization'''
-        confirmation, c_done = QInputDialog.getText(self,'CONFIRM',f'Type "CONFIRM" to erase your organizations password database and create a new one:')
+        confirmation, c_done = QInputDialog.getText(self,'CONFIRM',f'Please ensure every member has exported their password database. \n\n***CONTINUING WITH THIS ACTION WILL ERASE THE ENTIRE DATABASE*** \n\nType "CONFIRM" to procede:')
         self.how_many_users = QInputDialog.getInt(self, "How Many Users?", "How Many Users?", 1, 1, 30)[0]
         #print(self.how_many_users)
         if confirmation == 'CONFIRM' and c_done:
