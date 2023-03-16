@@ -10,7 +10,7 @@ class collect_information(QDialog):
     '''
 
 
-    def __init__(self, layout_terms: list = [], flags: list = [], parent=None):
+    def __init__(self, layout_terms: list = [], flags: list = [], title: str = '', parent=None):
 
 
         super(collect_information, self).__init__(parent)
@@ -19,6 +19,7 @@ class collect_information(QDialog):
         self.file_choice = ''
         self.file_label = ''
         self.new_database = ''
+        self.setWindowTitle(title)
 
 
         #Buttons
@@ -61,6 +62,7 @@ class collect_information(QDialog):
 
         self.win_layout.addWidget(self.buttons[0],100, 0)
         self.win_layout.addWidget(self.buttons[1],100, 1)
+
 
     def enter(self):
         self.use_this_data = True

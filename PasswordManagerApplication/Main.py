@@ -21,7 +21,7 @@ class App(QWidget):
         #self.Database = MasterDatabase("LOCATIONHERE")
         self.format = False
         self.database_location = ''
-        
+        self.make_new_database = False
 
         self.login_screen()
 
@@ -33,7 +33,7 @@ class App(QWidget):
     def login_screen(self):
         correct_credentials = False
 
-        self.screen = collect_information(["*Master Password:","Username:","*Password:"],['file','format'])
+        self.screen = collect_information(["*Master Password:","Username:","*Password:"],['file','format'], "Password Manager")
         
         
         
@@ -46,8 +46,8 @@ class App(QWidget):
 
             if self.screen.new_database:
                 #self.Database = MasterDatabase('Passwords.txt')
-                self.accept()
-                
+                self.make_new_database = True
+                print(self.screen.new_database)
 
 
 
@@ -73,14 +73,18 @@ class App(QWidget):
                     self.Database = MasterDatabase(self.database_location)
                 #Lastly, create new database and database_location files locally
                 except:
-                    with open("DataBase_location.txt",'w') as File:
-                        File.write("Passwords.txt")
-                        self.database_location = "Passwords.txt"
-                    self.Database = MasterDatabase(self.database_location, ['Initialize'])
-                    message = QMessageBox()
-                    message.setText("Database not selected and/or database_location.txt not found\nDataBase_location.txt created in current directory\nPasswords.txt created as database file in current directory\nLogging in using password: 'Password'\nSelect 'Admin Options' -> 'Format Database' to set up database location for future use")
-                    message.exec()
-                    m_pass = "Password"
+                    self.make_new_database = True
+
+            if self.make_new_database:
+
+                with open("DataBase_location.txt",'w') as File:
+                    File.write(self.screen.new_database)
+                    self.database_location = self.screen.new_database
+                self.Database = MasterDatabase(self.database_location, ['Initialize'])
+                message = QMessageBox()
+                message.setText("Either:\n\n1. Selected database location not found\n2. Stored database location not valid\n3. New database being intentionally created\n\nDataBase_location.txt created in current directory. Do not delete this file.\n\n\nFOLLOW THESE STEPS TO INITIALIZE NEW DATABASE:\n1. Select 'Admin Options' -> 'Format Database'\n2. Follow on screen directions \n\t(First username entered will be admin)\n3. Program will close when finished.\n4. Reopen program and log in with 'Password',[Username],'Password'")
+                message.exec()
+                m_pass = "Password"
 
 
             #Master Password Validation
@@ -214,7 +218,9 @@ class App(QWidget):
         self.show()
 
     def export_passwords(self):
-        self.Database.export_passwords('ExportedPasswords.txt')
+        confirmation, c_done = QInputDialog.getText(self,'CONFIRM',f'Typing "CONFIRM" will export an UNENCRYPTED list of passwords as "ExportedPasswords.txt." This text file can then be uploaded into a new database.')
+        if confirmation:
+            self.Database.export_passwords('ExportedPasswords.txt')
 
 
     def reveal_password(self):
@@ -355,6 +361,7 @@ class App(QWidget):
 
     def credits_message(self):
         message = QMessageBox()
+        message.setWindowTitle("Credits")
         message.setText('Written by Pierce Gloyer')
         message.exec()
         pass
@@ -362,6 +369,7 @@ class App(QWidget):
 
     def admin_options(self):
         self.admin_options_window = admin(self)
+        self.admin_options_window.setWindowTitle("Admin Options")
         self.admin_options_window.exec()
         if self.admin_options_window.new_pass:
             self.Database.master_password = self.admin_options_window.new_pass
