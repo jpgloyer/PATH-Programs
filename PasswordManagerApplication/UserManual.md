@@ -6,7 +6,7 @@
 ## Use Instructions
 * When a user runs GPM, they will be prompted to enter three pieces of information:
     * A Group Master Password will allow the decryption of the skeleton of the shared file. This skeleton includes a group name, a list of enabled users, and sections of user passwords that remain under another level of encryption. 
-        * The first 'user' will act as the organization's shared password drive. One initial decryption will not reveal these passwords, but GPM will automatically run a second decryption using the Group Master Password that will open access.
+        * The first 'user' will act as the organization's shared password storage. One initial decryption will not reveal these passwords, but GPM will automatically run a second decryption using the Group Master Password that will open access.
     * A Username will tell GPM which section of encrypted information to evaluate with the:...
     * An Individual Password will allow a user to decrypt and access their private list of passwords 
 * Available Actions:
