@@ -1,7 +1,6 @@
 import random
 
 
-#--------------------------------------Add export_to_csv option-----------------------------------
 
 class MasterDatabase():
     def __init__(self, database_location, flags: list = []):
@@ -13,12 +12,10 @@ class MasterDatabase():
         self.Reference_Character_List = self.get_chars()
         self.max_key = int(len(self.Reference_Character_List)/2-1)
         
-        
 
         for i in flags:
             if i == 'Initialize':
-                self.initialize_database(['User'])
-                
+                self.initialize_database()
 
             
         self.message_list = self.message_list_generator()
@@ -31,18 +28,18 @@ class MasterDatabase():
         self.master_password = pswd
         self.m_pw_vals, self.m_pw_key = self.get_vals_from_password(self.master_password)
 
-    def input_personal_password(self,pswd):
-        """
-        Takes a password input and converts it into the necessary encryption keys
-        """
-        self.personal_password = pswd
-        self.p_pw_vals, self.p_pw_key = self.get_vals_from_password(self.personal_password)
+    # def input_personal_password(self,pswd):
+    #     """
+    #     Takes a password input and converts it into the necessary encryption keys
+    #     """
+    #     self.personal_password = pswd
+    #     self.p_pw_vals, self.p_pw_key = self.get_vals_from_password(self.personal_password)
 
-    def input_username(self, username):
-        """
-        Assigns a username for the active user
-        """
-        self.username = username
+    # def input_username(self, username):
+    #     """
+    #     Assigns a username for the active user
+    #     """
+    #     self.username = username
 
     def get_chars(self):
         '''
@@ -147,19 +144,19 @@ class MasterDatabase():
         '''
         doc_type: str = 'Master' or 'Personal'
         '''
-        if doc_type == 'Master':
-            self.m_pw_vals, self.m_pw_key = self.get_vals_from_password(self.master_password)
-            key = self.m_pw_key
-            password_values = self.m_pw_vals
-        elif doc_type == 'Personal':
-            key = self.p_pw_key
-            password_values = self.p_pw_vals
-        elif doc_type == 'Group':
-            key = self.m_pw_key
-            password_values = self.m_pw_vals
-        elif doc_type == 'Temp':
-            key = self.temp_key
-            password_values = self.temp_password_vals
+        doc_type = "Master"
+        self.m_pw_vals, self.m_pw_key = self.get_vals_from_password(self.master_password)
+        key = self.m_pw_key
+        password_values = self.m_pw_vals
+        # elif doc_type == 'Personal':
+        #     key = self.p_pw_key
+        #     password_values = self.p_pw_vals
+        # elif doc_type == 'Group':
+        #     key = self.m_pw_key
+        #     password_values = self.m_pw_vals
+        # elif doc_type == 'Temp':
+        #     key = self.temp_key
+        #     password_values = self.temp_password_vals
 
         encrypted_message = []
         #Converts message string to encrypted_message list of characters
@@ -178,10 +175,10 @@ class MasterDatabase():
                             encrypted_message[j] = self.char_input_output(encrypted_message[j], key)        
         if doc_type == 'Master':
             self.master_encrypted_message = encrypted_message
-        elif doc_type == 'Personal':
-            self.personal_encrypted_message = encrypted_message
-        elif doc_type == 'Group':
-            self.decrypted_group_message = ('').join(encrypted_message)
+        # elif doc_type == 'Personal':
+        #     self.personal_encrypted_message = encrypted_message
+        # elif doc_type == 'Group':
+        #     self.decrypted_group_message = ('').join(encrypted_message)
         
         return encrypted_message                  
 
@@ -189,18 +186,19 @@ class MasterDatabase():
         '''
         doc_type: string 'Master', 'Personal', or 'Temp'
         '''
-        if doc_type == 'Master':
-            key = self.m_pw_key
-            password_values = self.m_pw_vals
-        elif doc_type == 'Personal':
-            key = self.p_pw_key
-            password_values = self.p_pw_vals
-        elif doc_type == 'Group':
-            key = self.m_pw_key
-            password_values = self.m_pw_vals
-        elif doc_type == 'Temp':
-            key = self.temp_key
-            password_values = self.temp_password_vals
+        #if doc_type == 'Master':
+        doc_type = "Master"
+        key = self.m_pw_key
+        password_values = self.m_pw_vals
+        # elif doc_type == 'Personal':
+        #     key = self.p_pw_key
+        #     password_values = self.p_pw_vals
+        # elif doc_type == 'Group':
+        #     key = self.m_pw_key
+        #     password_values = self.m_pw_vals
+        # elif doc_type == 'Temp':
+        #     key = self.temp_key
+        #     password_values = self.temp_password_vals
         decrypted_message = []
         password_values.reverse()
         for i in encrypted_message:
@@ -217,11 +215,11 @@ class MasterDatabase():
                         if j % i == 0:
                             decrypted_message[j] = self.char_input_output(decrypted_message[j], -key)
         if doc_type == 'Master':
-            self.decrypted_master_message = ('').join(decrypted_message)
-        elif doc_type == 'Personal':
             self.decrypted_personal_message = ('').join(decrypted_message)
-        elif doc_type == 'Group':
-            self.decrypted_group_message = ('').join(decrypted_message)
+        # elif doc_type == 'Personal':
+        #     self.decrypted_personal_message = ('').join(decrypted_message)
+        # elif doc_type == 'Group':
+        #     self.decrypted_group_message = ('').join(decrypted_message)
         return decrypted_message
 
 
@@ -241,47 +239,46 @@ class MasterDatabase():
         
         return new_password
 
-    def initialize_database(self, users: list = []):
+    def initialize_database(self):
         """
         Creates a new document located at self.database_location that is correctly formatted and encrypted according to the list of users passed
         Returns the location of the newly created database, or returns string "missing argument (users: list)"
         """
-        if not users:
-            return "Missing Argument (users: list)"
+        # if not users:
+        #     return "Missing Argument (users: list)"
 
-        default_user_data = "Website: Username: Password: "
+        default_data = "Website: Username: Password: \nTest: Test: Test: "
 
-        self.temp_password_vals, self.temp_key = self.get_vals_from_password('Password')
-        encrypted_default_user_data = ('').join(self.encrypt('Temp',default_user_data))
+        self.input_master_password("Password")
+        self.m_pw_vals, self.m_pw_key = self.get_vals_from_password(self.master_password)
+        encrypted_default_data = ('').join(self.encrypt('Master',default_data))
 
-        unencrypted_document = ''
 
-        unencrypted_document = unencrypted_document + "Preamble: " + '\n'
 
-        counter = 1
-        for i in users:
-            unencrypted_document = unencrypted_document + i + f': {counter}\n'
-            counter += 1
-        for i in users:
-            unencrypted_document = unencrypted_document + "2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n" + encrypted_default_user_data + '\n'
+        # counter = 1
+        # for i in users:
+        #     unencrypted_document = unencrypted_document + i + f': {counter}\n'
+        #     counter += 1
+        # for i in users:
+        #     unencrypted_document = unencrypted_document + "2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n" + encrypted_default_data + '\n'
 
-        unencrypted_document = unencrypted_document[:-1]
+        #unencrypted_document = unencrypted_document[:-1]
  
         with open(self.database_location,'w') as NewFile:
-            NewFile.write(('').join(self.encrypt('Temp',unencrypted_document)))
+            NewFile.write(encrypted_default_data)
         return self.database_location
 
-    def split_file_information(self):
-        """
-        Should only run after master password decryption
-        Splits main file into sections to enable user access to their personal section
-        Returns a list containing the contents of the file sections and a dictionary of users containing their user ID#
-        """
-        self.file_sections = self.decrypted_master_message.split('\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n')
-        self.users = {}
-        for line in self.file_sections[0].split('\n')[1:]:
-            self.users[line.split(': ')[0]] = line.split(': ')[1]
-        return self.file_sections,self.users
+    # def split_file_information(self):
+    #     """
+    #     Should only run after master password decryption
+    #     Splits main file into sections to enable user access to their personal section
+    #     Returns a list containing the contents of the file sections and a dictionary of users containing their user ID#
+    #     """
+    #     self.file_sections = self.decrypted_master_message.split('\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n')
+    #     self.users = {}
+    #     for line in self.file_sections[0].split('\n')[1:]:
+    #         self.users[line.split(': ')[0]] = line.split(': ')[1]
+    #     return self.file_sections,self.users
 
 
     #Personal Information Functions
@@ -300,17 +297,17 @@ class MasterDatabase():
         
         return self.personal_info_list
 
-    def make_group_info_list(self):
-        #-------------------------------------------------------------Finish this--------------------------------------
-        """
-        Not currently in use
-        Splits a group's shared section into a list of entries
-        Each entry is a list of form [Website, Username, Password]
-        """
-        self.group_info_list = [i.split(': ') for i in self.decrypted_group_message.split('\n')]
-        self.group_info_list[1:] = sorted(self.group_info_list[1:],key=lambda x: x[0].lower())
-        #print(self.group_info_list)
-        return self.group_info_list
+    # def make_group_info_list(self):
+    #     #-------------------------------------------------------------Finish this--------------------------------------
+    #     """
+    #     Not currently in use
+    #     Splits a group's shared section into a list of entries
+    #     Each entry is a list of form [Website, Username, Password]
+    #     """
+    #     self.group_info_list = [i.split(': ') for i in self.decrypted_group_message.split('\n')]
+    #     self.group_info_list[1:] = sorted(self.group_info_list[1:],key=lambda x: x[0].lower())
+    #     #print(self.group_info_list)
+    #     return self.group_info_list
 
 
 
@@ -324,11 +321,16 @@ class MasterDatabase():
         for i in self.personal_info_list:
             lines.append((': ').join(i))
         lines = ('\n').join(lines)
-        if self.users[self.username] != '1':
-            encrypted_lines = ('').join(self.encrypt('Personal', lines))
-        else:
-            encrypted_lines = ('').join(self.encrypt('Group', lines))
-        self.file_sections[int(self.users[self.username])] = encrypted_lines
+        # if self.users[self.username] != '1':
+        #     encrypted_lines = ('').join(self.encrypt('Personal', lines))
+        #else:
+        encrypted_lines = ('').join(self.encrypt('Master', lines))
+        # self.file_sections[int(self.users[self.username])] = encrypted_lines
+
+        print(self.database_location)
+        with open(self.database_location, 'w') as UpdatedFile:
+            UpdatedFile.write(encrypted_lines)
+
         return encrypted_lines
 
     def reencrypt(self):
