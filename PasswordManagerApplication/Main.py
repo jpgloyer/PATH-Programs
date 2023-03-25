@@ -8,7 +8,7 @@ from collect_information import collect_information
 
 
 
-
+"""SingleUser"""
 
 class App(QWidget):
     def __init__(self):
