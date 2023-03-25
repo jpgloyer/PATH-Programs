@@ -315,10 +315,10 @@ class App(QWidget):
             message.exec()
         pass
 
-    def change_personal_password(self):
-        personal_password, pp_done = QInputDialog.getText(self, 'Personal Password', 'Enter Personal Password:')
-        self.Database.input_personal_password(personal_password)
-        pass
+    # def change_personal_password(self):
+    #     personal_password, pp_done = QInputDialog.getText(self, 'Personal Password', 'Enter Personal Password:')
+    #     self.Database.input_personal_password(personal_password)
+    #     pass
 
     def import_passwords(self):
         File = QFileDialog()
@@ -357,7 +357,7 @@ class App(QWidget):
     def credits_message(self):
         message = QMessageBox()
         message.setWindowTitle("Credits")
-        message.setText('Written by Pierce Gloyer')
+        message.setText('Developed by Pierce Gloyer\njpgloyer@gmail.com')
         message.exec()
         pass
 
