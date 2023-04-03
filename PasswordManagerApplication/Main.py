@@ -3,7 +3,6 @@ import os
 from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QInputDialog, QMessageBox, QListWidget, QListWidgetItem, QGridLayout, QWidget
 from MasterDatabase import MasterDatabase
 import pyperclip
-#from admin import admin
 from csv import reader
 from collect_information import collect_information
 
@@ -19,7 +18,6 @@ class App(QWidget):
         self.top=400
         self.width=400
         self.height=400
-        # self.format = False
         self.database_location = ''
         self.make_new_database = False
 
@@ -42,7 +40,6 @@ class App(QWidget):
 
             if self.screen.new_database:
                 self.make_new_database = True
-                #print(self.screen.new_database)
 
 
 
@@ -79,13 +76,6 @@ class App(QWidget):
                 message.exec()
                 m_pass = 'Password'
                 
-                '''    File.write(self.screen.new_database)
-                    self.database_location = self.screen.new_database
-                self.Database = MasterDatabase(self.database_location, ['Initialize'])
-                message = QMessageBox()
-                message.setText("Either:\n\n1. Selected database location not found\n2. Stored database location not valid\n3. New database being intentionally created\n\nDataBase_location.txt created in current directory. Do not delete this file.\n\n\nFOLLOW THESE STEPS TO INITIALIZE NEW DATABASE:\n1. Select 'Admin Options' -> 'Format Database'\n2. Follow on screen directions \n\t(First username entered will be admin)\n3. Program will close when finished.\n4. Reopen program and log in with 'Password',[Username],'Password'")
-                message.exec()
-                m_pass = "Password"'''
 
 
             #Master Password Validation
@@ -97,40 +87,6 @@ class App(QWidget):
             
             self.Database.make_personal_info_list()
 
-            # if self.Database.decrypted_master_message.find('Preamble:') != -1:
-            #     correct_master = True
-
-
-            #Username Validation
-            # valid_user = False
-            # if correct_master:
-            #     self.Database.split_file_information()
-            #     try:
-            #         self.Database.input_username(uname)
-            #         self.Database.users[self.Database.username]
-            #         valid_user = True
-            #     except:
-            #         if uname == '':
-            #             valid_user = True
-            #             for username, value in self.Database.users.items():
-            #                 if value == '1':
-            #                     self.Database.input_username(username)
-            #                     #print(username)
-            #         pass
-
-            # #User Password Validation
-            # correct_personal = False
-            # if valid_user:
-            #     if ppass == '':
-            #         ppass = m_pass
-            #     self.Database.input_personal_password(ppass)
-            #     self.Database.decrypt('Personal',self.Database.file_sections[int(self.Database.users[self.Database.username])])
-            #     #
-            #     self.Database.decrypt('Group',self.Database.file_sections[1])
-            #     if self.Database.decrypted_personal_message.find('Website: Username: Password:') != -1:
-            #         correct_personal = True
-                
-                    
             
             #Results
             if correct_master:# and valid_user and correct_personal:
@@ -142,16 +98,6 @@ class App(QWidget):
                 message = QMessageBox()
                 message.setText(f"INVALID MASTER PASSWORD\n{self.screen.attempts_remaining} attempts remaining")
                 message.exec()
-            # elif not valid_user and self.screen.attempts_remaining >= 0:
-            #     self.screen.attempts_remaining -= 1
-            #     message = QMessageBox()
-            #     message.setText(f"INVALID USERNAME\n{self.screen.attempts_remaining} attempts remaining")
-            #     message.exec()
-            # elif not correct_personal and self.screen.attempts_remaining >= 0:
-            #     self.screen.attempts_remaining -= 1
-            #     message = QMessageBox()
-            #     message.setText(f"INVALID PERSONAL PASSWORD\n{self.screen.attempts_remaining} attempts remaining")
-            #     message.exec()
 
         
         if self.screen.attempts_remaining <= 0:
@@ -179,10 +125,6 @@ class App(QWidget):
         self.remove=QPushButton('Remove Entry',self)
         self.remove.clicked.connect(self.remove_entry)
 
-        #Change personal password
-        #if len(self.Database.users) > 1 and self.Database.users[self.Database.username] != '1':
-        #self.change_personal_password_button=QPushButton('Change Personal Password',self)
-        #self.change_personal_password_button.clicked.connect(self.change_personal_password)
 
         #Import passwords
         self.import_passwords_button = QPushButton("Import Passwords",self)
@@ -206,17 +148,12 @@ class App(QWidget):
         self.change_master_pw_button = QPushButton("Change Master Password",self)
         self.change_master_pw_button.clicked.connect(self.change_master_pw)
         layout.addWidget(self.change_master_pw_button, 3, 2)
-        #if self.Database.users[self.Database.username] == '2' or len(self.Database.users) == 1:
-        # self.admin_button = QPushButton('Admin options',self)
-        # self.admin_button.clicked.connect(self.admin_options)
-        # layout.addWidget(self.admin_button, 3, 2)
 
         layout.addWidget(self.reveal,0,0)
         layout.addWidget(self.add,1,0)
         layout.addWidget(self.change_entry_password,2,0)
         layout.addWidget(self.remove,3,0)
-        #if len(self.Database.users) > 1 and self.Database.users[self.Database.username] != '1':
-        #layout.addWidget(self.change_personal_password_button,4,0)
+
         layout.addWidget(self.list_widget,0,1,4,1)
         layout.addWidget(self.credits, 4, 2)
         layout.addWidget(self.export, 5,2)
@@ -328,10 +265,7 @@ class App(QWidget):
             message.exec()
         pass
 
-    # def change_personal_password(self):
-    #     personal_password, pp_done = QInputDialog.getText(self, 'Personal Password', 'Enter Personal Password:')
-    #     self.Database.input_personal_password(personal_password)
-    #     pass
+
 
     def import_passwords(self):
         File = QFileDialog()
@@ -378,17 +312,6 @@ class App(QWidget):
         new_pass = QInputDialog.getText(self,'New Master Password', 'Enter new organization master password: ')[0]
         self.Database.input_master_password(new_pass)
 
-    # def admin_options(self):
-    #     self.admin_options_window = admin(self)
-    #     self.admin_options_window.setWindowTitle("Admin Options")
-    #     self.admin_options_window.exec()
-    #     if self.admin_options_window.new_pass:
-    #         self.Database.master_password = self.admin_options_window.new_pass
-    #     # if self.admin_options_window.format == True:
-    #     #     self.format = True
-    #     #     self.close()
-    #     #     pass
-    #     pass
     
     def get_database(self):
         return self.Database
@@ -405,20 +328,5 @@ if __name__=='__main__':
     Database = ex.get_database()
 
 
-    #-------------------------------------FIX THIS CRAP-------------------------------------------
-
-    # if ex.format == True:
-
-    #     if ex.admin_options_window.how_many_users > 1:
-    #         information_to_collect = [f"User{i}" if i != 0 else "Group:" for i in range(ex.admin_options_window.how_many_users+1)]
-    #     else:
-    #         information_to_collect = ["User:"]
-    #     initialize = collect_information(information_to_collect)
-    #     initialize.exec()
-
-    #     if initialize.use_this_data:
-    #         new_db_vals = initialize.return_values()
-    #         Database.initialize_database(new_db_vals)
-    # else:
     Database.save_changes()
         #Database.reencrypt()

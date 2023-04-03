@@ -28,18 +28,6 @@ class MasterDatabase():
         self.master_password = pswd
         self.m_pw_vals, self.m_pw_key = self.get_vals_from_password(self.master_password)
 
-    # def input_personal_password(self,pswd):
-    #     """
-    #     Takes a password input and converts it into the necessary encryption keys
-    #     """
-    #     self.personal_password = pswd
-    #     self.p_pw_vals, self.p_pw_key = self.get_vals_from_password(self.personal_password)
-
-    # def input_username(self, username):
-    #     """
-    #     Assigns a username for the active user
-    #     """
-    #     self.username = username
 
     def get_chars(self):
         '''
@@ -228,30 +216,9 @@ class MasterDatabase():
 
 
 
-        # counter = 1
-        # for i in users:
-        #     unencrypted_document = unencrypted_document + i + f': {counter}\n'
-        #     counter += 1
-        # for i in users:
-        #     unencrypted_document = unencrypted_document + "2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n" + encrypted_default_data + '\n'
-
-        #unencrypted_document = unencrypted_document[:-1]
- 
         with open(self.database_location,'w') as NewFile:
             NewFile.write(encrypted_default_data)
         return self.database_location
-
-    # def split_file_information(self):
-    #     """
-    #     Should only run after master password decryption
-    #     Splits main file into sections to enable user access to their personal section
-    #     Returns a list containing the contents of the file sections and a dictionary of users containing their user ID#
-    #     """
-    #     self.file_sections = self.decrypted_master_message.split('\n2jg08#8h2g0**@)2hfwlWIGhlwenUHw3*\n')
-    #     self.users = {}
-    #     for line in self.file_sections[0].split('\n')[1:]:
-    #         self.users[line.split(': ')[0]] = line.split(': ')[1]
-    #     return self.file_sections,self.users
 
 
     #Personal Information Functions
@@ -270,17 +237,6 @@ class MasterDatabase():
         
         return self.personal_info_list
 
-    # def make_group_info_list(self):
-    #     #-------------------------------------------------------------Finish this--------------------------------------
-    #     """
-    #     Not currently in use
-    #     Splits a group's shared section into a list of entries
-    #     Each entry is a list of form [Website, Username, Password]
-    #     """
-    #     self.group_info_list = [i.split(': ') for i in self.decrypted_group_message.split('\n')]
-    #     self.group_info_list[1:] = sorted(self.group_info_list[1:],key=lambda x: x[0].lower())
-    #     #print(self.group_info_list)
-    #     return self.group_info_list
 
 
 
@@ -294,11 +250,8 @@ class MasterDatabase():
         for i in self.personal_info_list:
             lines.append((': ').join(i))
         lines = ('\n').join(lines)
-        # if self.users[self.username] != '1':
-        #     encrypted_lines = ('').join(self.encrypt('Personal', lines))
-        #else:
+        
         encrypted_lines = ('').join(self.encrypt('Master', lines))
-        # self.file_sections[int(self.users[self.username])] = encrypted_lines
 
         print(self.database_location)
         with open(self.database_location, 'w') as UpdatedFile:
