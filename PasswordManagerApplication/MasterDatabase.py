@@ -104,16 +104,13 @@ class MasterDatabase():
         #Code here doesn't really matter as long as the key is never allowed to be greater than the max_key. Everything else will produce the 
         #same result when used for encryption and decryption
         for i in password_vals:
-            #print(password_vals[-1])
             if password_vals[0] != 0 and password_vals[-1] != 0:
                 if i % password_vals[0] < 2 and i % password_vals[-1] < 2:
                     key += i
-            #key += i
             if key > self.max_key:
                 key = 1
         if key == 0:
             key = 1
-        #print(key)
         return password_vals, key
 
 
@@ -148,15 +145,6 @@ class MasterDatabase():
         self.m_pw_vals, self.m_pw_key = self.get_vals_from_password(self.master_password)
         key = self.m_pw_key
         password_values = self.m_pw_vals
-        # elif doc_type == 'Personal':
-        #     key = self.p_pw_key
-        #     password_values = self.p_pw_vals
-        # elif doc_type == 'Group':
-        #     key = self.m_pw_key
-        #     password_values = self.m_pw_vals
-        # elif doc_type == 'Temp':
-        #     key = self.temp_key
-        #     password_values = self.temp_password_vals
 
         encrypted_message = []
         #Converts message string to encrypted_message list of characters
@@ -175,10 +163,6 @@ class MasterDatabase():
                             encrypted_message[j] = self.char_input_output(encrypted_message[j], key)        
         if doc_type == 'Master':
             self.master_encrypted_message = encrypted_message
-        # elif doc_type == 'Personal':
-        #     self.personal_encrypted_message = encrypted_message
-        # elif doc_type == 'Group':
-        #     self.decrypted_group_message = ('').join(encrypted_message)
         
         return encrypted_message                  
 
@@ -190,15 +174,7 @@ class MasterDatabase():
         doc_type = "Master"
         key = self.m_pw_key
         password_values = self.m_pw_vals
-        # elif doc_type == 'Personal':
-        #     key = self.p_pw_key
-        #     password_values = self.p_pw_vals
-        # elif doc_type == 'Group':
-        #     key = self.m_pw_key
-        #     password_values = self.m_pw_vals
-        # elif doc_type == 'Temp':
-        #     key = self.temp_key
-        #     password_values = self.temp_password_vals
+
         decrypted_message = []
         password_values.reverse()
         for i in encrypted_message:
@@ -216,10 +192,7 @@ class MasterDatabase():
                             decrypted_message[j] = self.char_input_output(decrypted_message[j], -key)
         if doc_type == 'Master':
             self.decrypted_personal_message = ('').join(decrypted_message)
-        # elif doc_type == 'Personal':
-        #     self.decrypted_personal_message = ('').join(decrypted_message)
-        # elif doc_type == 'Group':
-        #     self.decrypted_group_message = ('').join(decrypted_message)
+       
         return decrypted_message
 
 

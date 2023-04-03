@@ -3,7 +3,7 @@ import os
 from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QInputDialog, QMessageBox, QListWidget, QListWidgetItem, QGridLayout, QWidget
 from MasterDatabase import MasterDatabase
 import pyperclip
-from admin import admin
+#from admin import admin
 from csv import reader
 from collect_information import collect_information
 
@@ -19,7 +19,7 @@ class App(QWidget):
         self.top=400
         self.width=400
         self.height=400
-        self.format = False
+        # self.format = False
         self.database_location = ''
         self.make_new_database = False
 
@@ -42,7 +42,7 @@ class App(QWidget):
 
             if self.screen.new_database:
                 self.make_new_database = True
-                print(self.screen.new_database)
+                #print(self.screen.new_database)
 
 
 
@@ -203,10 +203,13 @@ class App(QWidget):
         
 
 
+        self.change_master_pw_button = QPushButton("Change Master Password",self)
+        self.change_master_pw_button.clicked.connect(self.change_master_pw)
+        layout.addWidget(self.change_master_pw_button, 3, 2)
         #if self.Database.users[self.Database.username] == '2' or len(self.Database.users) == 1:
-        self.admin_button = QPushButton('Admin options',self)
-        self.admin_button.clicked.connect(self.admin_options)
-        layout.addWidget(self.admin_button, 3, 2)
+        # self.admin_button = QPushButton('Admin options',self)
+        # self.admin_button.clicked.connect(self.admin_options)
+        # layout.addWidget(self.admin_button, 3, 2)
 
         layout.addWidget(self.reveal,0,0)
         layout.addWidget(self.add,1,0)
@@ -371,18 +374,21 @@ class App(QWidget):
         message.exec()
         pass
 
+    def change_master_pw(self):
+        new_pass = QInputDialog.getText(self,'New Master Password', 'Enter new organization master password: ')[0]
+        self.Database.input_master_password(new_pass)
 
-    def admin_options(self):
-        self.admin_options_window = admin(self)
-        self.admin_options_window.setWindowTitle("Admin Options")
-        self.admin_options_window.exec()
-        if self.admin_options_window.new_pass:
-            self.Database.master_password = self.admin_options_window.new_pass
-        if self.admin_options_window.format == True:
-            self.format = True
-            self.close()
-            pass
-        pass
+    # def admin_options(self):
+    #     self.admin_options_window = admin(self)
+    #     self.admin_options_window.setWindowTitle("Admin Options")
+    #     self.admin_options_window.exec()
+    #     if self.admin_options_window.new_pass:
+    #         self.Database.master_password = self.admin_options_window.new_pass
+    #     # if self.admin_options_window.format == True:
+    #     #     self.format = True
+    #     #     self.close()
+    #     #     pass
+    #     pass
     
     def get_database(self):
         return self.Database
@@ -401,18 +407,18 @@ if __name__=='__main__':
 
     #-------------------------------------FIX THIS CRAP-------------------------------------------
 
-    if ex.format == True:
+    # if ex.format == True:
 
-        if ex.admin_options_window.how_many_users > 1:
-            information_to_collect = [f"User{i}" if i != 0 else "Group:" for i in range(ex.admin_options_window.how_many_users+1)]
-        else:
-            information_to_collect = ["User:"]
-        initialize = collect_information(information_to_collect)
-        initialize.exec()
+    #     if ex.admin_options_window.how_many_users > 1:
+    #         information_to_collect = [f"User{i}" if i != 0 else "Group:" for i in range(ex.admin_options_window.how_many_users+1)]
+    #     else:
+    #         information_to_collect = ["User:"]
+    #     initialize = collect_information(information_to_collect)
+    #     initialize.exec()
 
-        if initialize.use_this_data:
-            new_db_vals = initialize.return_values()
-            Database.initialize_database(new_db_vals)
-    else:
-        Database.save_changes()
+    #     if initialize.use_this_data:
+    #         new_db_vals = initialize.return_values()
+    #         Database.initialize_database(new_db_vals)
+    # else:
+    Database.save_changes()
         #Database.reencrypt()
