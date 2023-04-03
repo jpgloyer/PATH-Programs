@@ -83,8 +83,9 @@ class App(QWidget):
             correct_master = False
             self.Database.input_master_password(m_pass)
             self.Database.decrypt('Master',self.Database.message_list_generator())
-            correct_master = True
-            print("Fix This")
+            if self.Database.decrypted_personal_message[0:28] == 'Website: Username: Password:':
+                correct_master = True
+            
             self.Database.make_personal_info_list()
 
             # if self.Database.decrypted_master_message.find('Preamble:') != -1:
