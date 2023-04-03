@@ -215,7 +215,7 @@ class App(QWidget):
     def export_passwords(self):
         confirmation, c_done = QInputDialog.getText(self,'CONFIRM',f'Typing "CONFIRM" will export an UNENCRYPTED list of passwords as "ExportedPasswords.txt." This text file can then be uploaded into a new database.')
         if confirmation:
-            self.Database.export_passwords('ExportedPasswords.txt')
+            self.Database.export_passwords('ExportedPasswords.csv')
 
 
     def reveal_password(self):

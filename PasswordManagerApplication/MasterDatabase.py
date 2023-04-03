@@ -348,7 +348,9 @@ class MasterDatabase():
     def export_passwords(self, file_path: str = ''):
         with open(file_path, 'w') as Export:
             for i in self.personal_info_list:
-                Export.write(i[0]+','+i[1]+','+i[2]+'\n')
+                if i[0] != 'Website' and i[1] != 'Username' and i[2] != 'Password':
+                    Export.write(i[0]+','+i[1]+','+i[2]+'\n')
+            Export.close
 
 
 '''For testing purposes:'''
