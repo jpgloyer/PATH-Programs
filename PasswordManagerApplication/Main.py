@@ -1,4 +1,5 @@
 import sys
+import os
 from PyQt5.QtWidgets import QApplication, QPushButton, QFileDialog, QInputDialog, QMessageBox, QListWidget, QListWidgetItem, QGridLayout, QWidget
 from MasterDatabase import MasterDatabase
 import pyperclip
@@ -68,15 +69,23 @@ class App(QWidget):
                     self.make_new_database = True
 
             if self.make_new_database:
-
+                dir_path = os.path.dirname(os.path.realpath(__file__))
                 with open("DataBase_location.txt",'w') as File:
-                    File.write(self.screen.new_database)
+                    File.write("New_Database.txt")
+                    self.database_location = dir_path+"\\Database.txt"
+                self.Database = MasterDatabase(self.database_location, ['Initialize'])
+                message = QMessageBox()
+                message.setText(f"New database created in {self.database_location}\n\n\nPassword: Password")
+                message.exec()
+                m_pass = 'Password'
+                
+                '''    File.write(self.screen.new_database)
                     self.database_location = self.screen.new_database
                 self.Database = MasterDatabase(self.database_location, ['Initialize'])
                 message = QMessageBox()
                 message.setText("Either:\n\n1. Selected database location not found\n2. Stored database location not valid\n3. New database being intentionally created\n\nDataBase_location.txt created in current directory. Do not delete this file.\n\n\nFOLLOW THESE STEPS TO INITIALIZE NEW DATABASE:\n1. Select 'Admin Options' -> 'Format Database'\n2. Follow on screen directions \n\t(First username entered will be admin)\n3. Program will close when finished.\n4. Reopen program and log in with 'Password',[Username],'Password'")
                 message.exec()
-                m_pass = "Password"
+                m_pass = "Password"'''
 
 
             #Master Password Validation

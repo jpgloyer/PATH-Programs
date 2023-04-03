@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QFileDialog, QGridLayout, QLineEdit, QDialog, QPushButton, QLabel
-
+import os
 
 class collect_information(QDialog):
 
@@ -87,14 +87,15 @@ class collect_information(QDialog):
             self.win_layout.addWidget(self.file_label,3,1)
 
     def create_new_database(self):
-        database_select = QFileDialog()
-        database_select.setFileMode(QFileDialog.ExistingFile)
-        database_select.setNameFilter("*.txt")
+        #database_select = QFileDialog()
+        #database_select.setFileMode(QFileDialog.ExistingFile)
+        #database_select.setNameFilter("*.txt")
+        self.new_database = os.path.dirname(os.path.realpath(__file__)) + "\\Database.txt"
+        self.accept()
 
-        if database_select.exec():
-            self.new_database = database_select.selectedFiles()[0]
-            
-            self.accept()
+        #if database_select.exec():
+        #    self.new_database = database_select.selectedFiles()[0]
+        #    self.accept()
         
 
 
