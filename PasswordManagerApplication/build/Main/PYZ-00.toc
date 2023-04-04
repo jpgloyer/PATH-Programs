@@ -25,10 +25,6 @@
   ('_threading_local',
    'C:\\Users\\jpglo\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\_threading_local.py',
    'PYMODULE'),
-  ('admin',
-   'C:\\Users\\jpglo\\OneDrive\\Desktop\\Git '
-   'Repos\\PATH-Programs\\PasswordManagerApplication\\admin.py',
-   'PYMODULE'),
   ('argparse',
    'C:\\Users\\jpglo\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\argparse.py',
    'PYMODULE'),
