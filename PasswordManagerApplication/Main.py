@@ -309,7 +309,7 @@ class App(QWidget):
         pass
 
     def change_master_pw(self):
-        new_pass = QInputDialog.getText(self,'New Master Password', 'Enter new organization master password: ')[0]
+        new_pass = QInputDialog.getText(self,'New Master Password', 'Enter new master password: ')[0]
         self.Database.input_master_password(new_pass)
 
     
