@@ -149,17 +149,18 @@ class App(QWidget):
 
         self.change_master_pw_button = QPushButton("Change Master Password",self)
         self.change_master_pw_button.clicked.connect(self.change_master_pw)
-        layout.addWidget(self.change_master_pw_button, 3, 2)
+        
+        layout.addWidget(self.change_master_pw_button, 4, 0)
 
         layout.addWidget(self.reveal,0,0)
         layout.addWidget(self.add,1,0)
         layout.addWidget(self.change_entry_password,2,0)
         layout.addWidget(self.remove,3,0)
 
-        layout.addWidget(self.list_widget,0,1,4,1)
-        layout.addWidget(self.credits, 4, 2)
-        layout.addWidget(self.export, 5,2)
-        layout.addWidget(self.import_passwords_button, 5,0)
+        layout.addWidget(self.list_widget,0,1,4,4)
+        layout.addWidget(self.credits, 4,3)
+        layout.addWidget(self.export, 4,2)
+        layout.addWidget(self.import_passwords_button, 4,1)
         #---------------------------------------------------------------------------------------Add button to generate a temporary random password
 
         self.show()

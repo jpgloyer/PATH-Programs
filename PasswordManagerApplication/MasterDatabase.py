@@ -253,7 +253,7 @@ class MasterDatabase():
         
         encrypted_lines = ('').join(self.encrypt('Master', lines))
 
-        print(self.database_location)
+        #print(self.database_location)
         with open(self.database_location, 'w') as UpdatedFile:
             UpdatedFile.write(encrypted_lines)
 
