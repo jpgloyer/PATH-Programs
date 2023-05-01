@@ -1,7 +1,7 @@
-('C:\\Users\\jpglo\\OneDrive\\Desktop\\Git '
+('C:\\Users\\jpglo\\Desktop\\Code\\Git '
  'Repos\\PATH-Programs\\PasswordManagerApplication\\build\\Main\\PYZ-00.pyz',
  [('MasterDatabase',
-   'C:\\Users\\jpglo\\OneDrive\\Desktop\\Git '
+   'C:\\Users\\jpglo\\Desktop\\Code\\Git '
    'Repos\\PATH-Programs\\PasswordManagerApplication\\MasterDatabase.py',
    'PYMODULE'),
   ('PyQt5',
@@ -44,7 +44,7 @@
    'C:\\Users\\jpglo\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\calendar.py',
    'PYMODULE'),
   ('collect_information',
-   'C:\\Users\\jpglo\\OneDrive\\Desktop\\Git '
+   'C:\\Users\\jpglo\\Desktop\\Code\\Git '
    'Repos\\PATH-Programs\\PasswordManagerApplication\\collect_information.py',
    'PYMODULE'),
   ('contextlib',

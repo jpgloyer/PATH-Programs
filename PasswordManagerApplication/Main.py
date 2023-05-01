@@ -66,7 +66,9 @@ class App(QWidget):
                     self.make_new_database = True
 
             if self.make_new_database:
-                dir_path = os.path.dirname(os.path.realpath(__file__))
+                dialog = QFileDialog()
+                dir_path = dialog.getExistingDirectory(self, 'Select directory to store your database:')
+                
                 with open("DataBase_location.txt",'w') as File:
                     File.write("New_Database.txt")
                     self.database_location = dir_path+"\\Database.txt"
